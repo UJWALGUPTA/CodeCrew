@@ -125,6 +125,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch repositories" });
     }
   });
+  
+  app.post("/api/repositories", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const { fullName, name, owner, url } = req.body;
+      
+      if (!fullName || !name || !owner || !url) {
+        return res.status(400).json({ message: "Missing required repository information" });
+      }
+      
+      // Check if repository already exists
+      const existingRepo = await storage.getRepositoryByFullName(fullName);
+      if (existingRepo) {
+        return res.json(existingRepo); // Return existing repo
+      }
+      
+      // Get the user
+      const user = await storage.getUser(req.session.userId!);
+      if (!user) {
+        return res.status(401).json({ message: "User not found" });
+      }
+      
+      // Create the repository
+      const repository = await storage.createRepository({
+        name,
+        fullName,
+        owner,
+        url,
+        description: null,
+        stars: null,
+        forks: null,
+        openIssues: null,
+        isPrivate: null
+      });
+      
+      // If user has GitHub access token, set up webhook
+      if (user.accessToken) {
+        try {
+          // Determine the webhook URL
+          const hostname = req.headers.host;
+          const protocol = process.env.REPLIT_DEPLOYMENT_ID ? 'https' : 'http';
+          const webhookUrl = `${protocol}://${hostname}/api/github/webhook`;
+          
+          // Create webhook for the repository
+          await githubClient.createWebhook(owner, name, user.accessToken, webhookUrl);
+          console.log(`Created webhook for ${fullName} pointing to ${webhookUrl}`);
+        } catch (webhookError) {
+          console.error(`Failed to create webhook for ${fullName}:`, webhookError);
+          // Continue anyway - we don't want to fail the repository creation just because webhook failed
+        }
+      }
+      
+      res.status(201).json(repository);
+    } catch (error) {
+      console.error("Error creating repository:", error);
+      res.status(500).json({ message: "Failed to create repository" });
+    }
+  });
 
   app.get("/api/repositories/:id", isAuthenticated, async (req: Request, res: Response) => {
     try {

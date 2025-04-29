@@ -215,18 +215,63 @@ class GitHubClient {
   }
 
   async createWebhook(owner: string, repo: string, accessToken: string, webhookUrl: string) {
-    // In a real implementation, this would call the GitHub API to create a webhook
-    // For this project, we'll just return a success response
-    return {
-      id: 12345,
-      url: `https://api.github.com/repos/${owner}/${repo}/hooks/12345`,
-      active: true,
-      events: ["issues", "issue_comment", "pull_request"],
-      config: {
-        url: webhookUrl,
-        content_type: "json",
-      },
-    };
+    console.log(`Setting up webhook for ${owner}/${repo} to ${webhookUrl}`);
+    
+    try {
+      // Check if webhook already exists for this repo
+      const hooksResponse = await fetch(`https://api.github.com/repos/${owner}/${repo}/hooks`, {
+        headers: {
+          'Authorization': `token ${accessToken}`,
+          'Accept': 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!hooksResponse.ok) {
+        throw new Error(`GitHub API error: ${hooksResponse.status} ${await hooksResponse.text()}`);
+      }
+      
+      const hooks = await hooksResponse.json();
+      
+      // Check if we already have a webhook with this URL
+      const existingHook = hooks.find((hook: any) => hook.config.url === webhookUrl);
+      if (existingHook) {
+        console.log(`Webhook already exists for ${owner}/${repo} with ID ${existingHook.id}`);
+        return existingHook;
+      }
+      
+      // Create new webhook
+      const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/hooks`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `token ${accessToken}`,
+          'Accept': 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: 'web',
+          active: true,
+          events: ['issues', 'issue_comment', 'pull_request'],
+          config: {
+            url: webhookUrl,
+            content_type: 'json',
+            insecure_ssl: '0',
+            secret: process.env.GITHUB_WEBHOOK_SECRET
+          }
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`GitHub API error: ${response.status} ${await response.text()}`);
+      }
+      
+      const webhook = await response.json();
+      console.log(`Created webhook for ${owner}/${repo} with ID ${webhook.id}`);
+      return webhook;
+    } catch (error) {
+      console.error('Error creating webhook:', error);
+      throw new Error(`Failed to create webhook: ${error.message}`);
+    }
   }
 
   // This method is deprecated and kept for backward compatibility
