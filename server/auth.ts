@@ -14,8 +14,16 @@ declare module "express-session" {
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
 const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
 
-// Use a fixed callback URL that matches exactly what's registered in the GitHub OAuth app
-const GITHUB_CALLBACK_URL = "https://7022de56-086f-4518-b706-fd8819d43438-00-krucavyhvoiv.worf.replit.dev/api/auth/github/callback";
+// Get the base URL from environment or construct from request
+function getCallbackUrl(req: Request) {
+  if (process.env.REPLIT_DEPLOYMENT_ID) {
+    // We're on a deployed Replit instance
+    return `https://${process.env.REPLIT_DOMAINS?.split(',')[0] || req.headers.host}/api/auth/github/callback`;
+  } else {
+    // We're in development
+    return `http://${req.headers.host}/api/auth/github/callback`;
+  }
+}
 
 export const startGithubOAuth = (req: Request, res: Response) => {
   // Create a random state to prevent CSRF attacks
@@ -25,7 +33,8 @@ export const startGithubOAuth = (req: Request, res: Response) => {
   req.session.oauthState = state;
   
   // Redirect to GitHub's authorization page
-  const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${encodeURIComponent(GITHUB_CALLBACK_URL)}&scope=user%20repo&state=${state}`;
+  const callbackUrl = getCallbackUrl(req);
+  const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${encodeURIComponent(callbackUrl)}&scope=user%20repo&state=${state}`;
   
   res.redirect(githubAuthUrl);
 };
@@ -50,7 +59,7 @@ export const handleGithubCallback = async (req: Request, res: Response) => {
         client_id: GITHUB_CLIENT_ID,
         client_secret: GITHUB_CLIENT_SECRET,
         code,
-        redirect_uri: GITHUB_CALLBACK_URL
+        redirect_uri: getCallbackUrl(req)
       })
     });
     
