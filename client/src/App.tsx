@@ -10,6 +10,7 @@ import BrowseIssues from "@/pages/browse-issues";
 import MyClaims from "@/pages/my-claims";
 import History from "@/pages/history";
 import RepositoryDetail from "@/pages/repository-detail";
+import AddRepository from "@/pages/add-repository";
 import Login from "@/pages/login";
 import { WalletProvider } from "@/hooks/use-wallet";
 import { AuthProvider } from "@/hooks/use-auth";
@@ -23,6 +24,7 @@ function Router() {
       <Route path="/my-claims" component={MyClaims} />
       <Route path="/history" component={History} />
       <Route path="/repository/:id" component={RepositoryDetail} />
+      <Route path="/add-repository" component={AddRepository} />
       <Route path="/login" component={Login} />
       <Route component={NotFound} />
     </Switch>

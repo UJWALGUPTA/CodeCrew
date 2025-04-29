@@ -1,19 +1,13 @@
-import type { Express, Request, Response } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { githubClient } from "./github";
 import { web3Client } from "./web3";
 import session from "express-session";
-
-// Extend the Express Request type to include session
-declare module "express-session" {
-  interface SessionData {
-    userId?: number;
-  }
-}
+import { startGithubOAuth, handleGithubCallback, logoutUser } from "./auth";
 
 // Authentication middleware
-const isAuthenticated = (req: Request, res: Response, next: Function) => {
+const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
   if (req.session && req.session.userId) {
     next();
   } else {
@@ -47,6 +41,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // GitHub OAuth routes
+  app.get("/api/auth/github", startGithubOAuth);
+  app.get("/api/auth/github/callback", handleGithubCallback);
+
+  // For development/testing purposes, keep the simple login
   app.post("/api/auth/login", async (req: Request, res: Response) => {
     // In a real implementation, this would process an OAuth callback from GitHub
     // For this project, we simulate a successful login
@@ -79,14 +78,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/auth/logout", (req: Request, res: Response) => {
-    req.session.destroy((err) => {
-      if (err) {
-        return res.status(500).json({ message: "Failed to logout" });
-      }
-      res.json({ message: "Logged out successfully" });
-    });
-  });
+  app.post("/api/auth/logout", logoutUser);
 
   // -------------------- GitHub Routes --------------------
 
