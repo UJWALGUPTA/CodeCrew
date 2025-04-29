@@ -16,11 +16,25 @@ import { useAuth } from "@/hooks/use-auth";
 import { useGithub } from "@/hooks/use-github";
 import { useWallet } from "@/hooks/use-wallet";
 import { apiRequest } from "@/lib/queryClient";
-import { AlertCircle, Github, Plus, ExternalLink, RefreshCw } from "lucide-react";
+import { AlertCircle, Github, Plus, ExternalLink, RefreshCw, Star, GitFork } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+
+interface Repository {
+  id: number;
+  name: string;
+  fullName: string;
+  description: string | null;
+  url: string;
+  stars: number | null;
+  forks: number | null;
+  openIssues: number | null;
+  isPrivate: boolean | null;
+  owner: string;
+}
 
 const formSchema = z.object({
   repositoryUrl: z.string().url("Please enter a valid GitHub URL").startsWith("https://github.com/", "Must be a GitHub repository URL"),
@@ -35,9 +49,17 @@ export default function AddRepository() {
   const { toast } = useToast();
   const { isAuthenticated } = useAuth();
   const { isConnected, connect } = useWallet();
-  const { isConnected: isGithubConnected, connect: connectGithub } = useGithub();
+  const { isConnected: isGithubConnected, connect: connectGithub, fetchUserRepositories } = useGithub();
   const queryClient = useQueryClient();
   const [isAdding, setIsAdding] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>("manual");
+
+  // Fetch GitHub repositories
+  const { data: githubRepos = [], isLoading: isLoadingRepos, refetch: refetchRepos } = useQuery<Repository[]>({
+    queryKey: ["/api/github/repositories"],
+    enabled: isGithubConnected,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -62,7 +84,7 @@ export default function AddRepository() {
       const fullName = `${owner}/${repo}`;
       
       // First, create the repository
-      const repository = await apiRequest("POST", "/api/repositories", {
+      const repository: any = await apiRequest("POST", "/api/repositories", {
         fullName,
         name: repo,
         owner,
@@ -92,6 +114,10 @@ export default function AddRepository() {
       });
     },
   });
+
+  const handleSelectRepository = (repo: Repository) => {
+    form.setValue("repositoryUrl", repo.url);
+  };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!isAuthenticated) {
@@ -178,72 +204,147 @@ export default function AddRepository() {
             </Alert>
           )}
 
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="repositoryUrl"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Repository URL</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="https://github.com/username/repository" 
-                        {...field} 
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Enter the full URL of your GitHub repository
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+          <Tabs 
+            value={activeTab} 
+            onValueChange={setActiveTab} 
+            className="mb-6"
+          >
+            <TabsList className="grid grid-cols-2">
+              <TabsTrigger value="select">Select Repository</TabsTrigger>
+              <TabsTrigger value="manual">Manual Entry</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="select" className="space-y-4 mt-4">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-medium">Your GitHub Repositories</h3>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => refetchRepos()}
+                  disabled={isLoadingRepos || !isGithubConnected}
+                >
+                  <RefreshCw className={`h-4 w-4 mr-2 ${isLoadingRepos ? 'animate-spin' : ''}`} />
+                  Refresh
+                </Button>
+              </div>
               
-              <FormField
-                control={form.control}
-                name="initialFunding"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Initial Funding (TOKENS)</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        min="0"
-                        step="1"
-                        {...field} 
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Amount of tokens to add to the repository reward pool
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <Button 
-                type="submit" 
-                className="w-full" 
-                disabled={isAdding || !isGithubConnected || !isConnected}
-              >
-                {isAdding ? (
-                  <span className="flex items-center">
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Adding Repository...
-                  </span>
-                ) : (
-                  <span className="flex items-center">
-                    <Plus className="mr-2 h-5 w-5" />
-                    Add Repository
-                  </span>
-                )}
-              </Button>
-            </form>
-          </Form>
+              {isLoadingRepos ? (
+                <div className="space-y-3">
+                  <Skeleton className="h-20 w-full" />
+                  <Skeleton className="h-20 w-full" />
+                  <Skeleton className="h-20 w-full" />
+                </div>
+              ) : githubRepos && githubRepos.length > 0 ? (
+                <div className="space-y-3">
+                  {githubRepos.map((repo: Repository) => (
+                    <Card key={repo.id} className="hover:border-primary cursor-pointer transition-all" onClick={() => handleSelectRepository(repo)}>
+                      <CardContent className="p-4">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <div className="font-medium">{repo.fullName}</div>
+                            <div className="text-sm text-muted-foreground line-clamp-1 mt-1">{repo.description || 'No description'}</div>
+                          </div>
+                          <div className="flex items-center space-x-3 text-xs text-muted-foreground">
+                            <div className="flex items-center">
+                              <Star className="h-3.5 w-3.5 mr-1" />
+                              {repo.stars || 0}
+                            </div>
+                            <div className="flex items-center">
+                              <GitFork className="h-3.5 w-3.5 mr-1" />
+                              {repo.forks || 0}
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 border rounded-md">
+                  <div className="text-muted-foreground mb-2">No repositories found</div>
+                  {isGithubConnected && (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => refetchRepos()}
+                    >
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      Refresh
+                    </Button>
+                  )}
+                </div>
+              )}
+            </TabsContent>
+            
+            <TabsContent value="manual">
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                  <FormField
+                    control={form.control}
+                    name="repositoryUrl"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Repository URL</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="https://github.com/username/repository" 
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Enter the full URL of your GitHub repository
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="initialFunding"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Initial Funding (TOKENS)</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="number" 
+                            min="0"
+                            step="1"
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Amount of tokens to add to the repository reward pool
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <Button 
+                    type="submit" 
+                    className="w-full" 
+                    disabled={isAdding || !isGithubConnected || !isConnected}
+                  >
+                    {isAdding ? (
+                      <span className="flex items-center">
+                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Adding Repository...
+                      </span>
+                    ) : (
+                      <span className="flex items-center">
+                        <Plus className="mr-2 h-5 w-5" />
+                        Add Repository
+                      </span>
+                    )}
+                  </Button>
+                </form>
+              </Form>
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
     </div>

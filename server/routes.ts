@@ -86,13 +86,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/github/repositories", isAuthenticated, async (req: Request, res: Response) => {
     try {
-      // In a real implementation, this would use the user's GitHub token to fetch repos
-      // For this project, we'll return the repositories from our in-memory database
-      const repos = await storage.listRepositories();
-      res.json(repos);
+      // Get the authenticated user
+      const user = await storage.getUser(req.session.userId!);
+      if (!user || !user.accessToken) {
+        return res.status(401).json({ message: "GitHub token not found. Please reconnect your GitHub account." });
+      }
+
+      // Fetch repositories from GitHub API
+      const repositories = await githubClient.getUserRepositories(user.accessToken);
+      
+      // Return only the necessary data to the client
+      const formattedRepos = repositories.map((repo: any) => ({
+        id: repo.id,
+        name: repo.name,
+        fullName: repo.full_name,
+        description: repo.description,
+        url: repo.html_url,
+        isPrivate: repo.private,
+        stars: repo.stargazers_count,
+        forks: repo.forks_count,
+        openIssues: repo.open_issues_count,
+        owner: repo.owner.login
+      }));
+      
+      res.json(formattedRepos);
     } catch (error) {
-      console.error("Error fetching repositories:", error);
-      res.status(500).json({ message: "Failed to fetch repositories" });
+      console.error("Error fetching GitHub repositories:", error);
+      res.status(500).json({ message: "Failed to fetch GitHub repositories" });
     }
   });
 

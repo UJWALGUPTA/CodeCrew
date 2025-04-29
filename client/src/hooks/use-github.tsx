@@ -105,8 +105,7 @@ export const GithubProvider = ({ children }: { children: ReactNode }) => {
     if (!isConnected) return [];
     
     try {
-      const response = await apiRequest("GET", "/api/github/repositories", undefined);
-      const repos = await response.json();
+      const repos = await apiRequest("GET", "/api/github/repositories", undefined);
       setRepositories(repos);
       return repos;
     } catch (error) {
