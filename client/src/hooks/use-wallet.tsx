@@ -15,7 +15,7 @@ interface WalletContextType {
   isConnecting: boolean;
   connect: () => Promise<void>;
   disconnect: () => void;
-  provider: ethers.providers.Web3Provider | null;
+  provider: ethers.BrowserProvider | null;
   signer: ethers.Signer | null;
 }
 
@@ -31,7 +31,7 @@ const WalletContext = createContext<WalletContextType>({
 });
 
 export const WalletProvider = ({ children }: { children: ReactNode }) => {
-  const [provider, setProvider] = useState<ethers.providers.Web3Provider | null>(null);
+  const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null);
   const [signer, setSigner] = useState<ethers.Signer | null>(null);
   const [address, setAddress] = useState("");
   const [balance, setBalance] = useState(0);
@@ -85,7 +85,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
   const handleConnection = async (walletAddress: string) => {
     try {
       // Create Web3 provider
-      const web3Provider = new ethers.providers.Web3Provider(window.ethereum);
+      const web3Provider = new ethers.BrowserProvider(window.ethereum);
       
       // Check if connected to Base chain
       const isBaseChain = await checkBaseChainConfig(web3Provider);
@@ -97,7 +97,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       }
       
       // Get the signer
-      const web3Signer = web3Provider.getSigner();
+      const web3Signer = await web3Provider.getSigner();
       
       // Get token balance
       const tokenBal = await getTokenBalance(walletAddress);

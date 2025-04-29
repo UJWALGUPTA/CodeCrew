@@ -26,7 +26,7 @@ export const BASE_CHAIN_ID = 84531; // Base Goerli testnet
 
 // Interface to represent wallet providers (MetaMask, WalletConnect, etc.)
 export interface WalletProvider {
-  provider: ethers.providers.Web3Provider;
+  provider: ethers.BrowserProvider;
   signer: ethers.Signer;
   address: string;
   connect: () => Promise<string>;
@@ -36,14 +36,14 @@ export interface WalletProvider {
 
 // Function to convert GitHub repo/issue identifiers to bytes32 for smart contracts
 export function stringToBytes32(text: string): string {
-  return ethers.utils.id(text);
+  return ethers.id(text);
 }
 
 // Check if user has Base Chain configured in their wallet
-export async function checkBaseChainConfig(provider: ethers.providers.Web3Provider): Promise<boolean> {
+export async function checkBaseChainConfig(provider: ethers.BrowserProvider): Promise<boolean> {
   try {
-    const chainId = (await provider.getNetwork()).chainId;
-    return chainId === BASE_CHAIN_ID;
+    const { chainId } = await provider.getNetwork();
+    return chainId === BigInt(BASE_CHAIN_ID);
   } catch (error) {
     console.error("Error checking chain configuration:", error);
     return false;
@@ -75,7 +75,7 @@ export async function addBaseChainToWallet(provider: any): Promise<boolean> {
 }
 
 // Initialize the Reward Pool Manager contract
-export function getRewardPoolManagerContract(providerOrSigner: ethers.providers.Provider | ethers.Signer): ethers.Contract {
+export function getRewardPoolManagerContract(providerOrSigner: ethers.Provider | ethers.Signer): ethers.Contract {
   return new ethers.Contract(
     REWARD_POOL_MANAGER_ADDRESS,
     RewardPoolManagerABI,
@@ -84,7 +84,7 @@ export function getRewardPoolManagerContract(providerOrSigner: ethers.providers.
 }
 
 // Initialize the Bounty Contract
-export function getBountyContract(providerOrSigner: ethers.providers.Provider | ethers.Signer): ethers.Contract {
+export function getBountyContract(providerOrSigner: ethers.Provider | ethers.Signer): ethers.Contract {
   return new ethers.Contract(
     BOUNTY_CONTRACT_ADDRESS,
     BountyContractABI,
@@ -93,8 +93,8 @@ export function getBountyContract(providerOrSigner: ethers.providers.Provider | 
 }
 
 // Initialize a read-only provider (for queries that don't require a signer)
-export function getReadOnlyProvider(): ethers.providers.JsonRpcProvider {
-  return new ethers.providers.JsonRpcProvider(BASE_RPC_URL);
+export function getReadOnlyProvider(): ethers.JsonRpcProvider {
+  return new ethers.JsonRpcProvider(BASE_RPC_URL);
 }
 
 // Mock token balance functions for development (in production, these would use actual on-chain data)
@@ -113,13 +113,13 @@ export async function fundRepositoryPool(
     const repoIdBytes32 = stringToBytes32(repoId);
     
     // Convert amount to Wei (assuming 18 decimals)
-    const amountWei = ethers.utils.parseUnits(amount.toString(), 18);
+    const amountWei = ethers.parseUnits(amount.toString(), 18);
     
     // Call the contract method
     const tx = await contract.fundPool(repoIdBytes32, amountWei);
     const receipt = await tx.wait();
     
-    return receipt.transactionHash;
+    return receipt.hash;
   } catch (error) {
     console.error("Error funding repository pool:", error);
     throw error;
@@ -138,13 +138,13 @@ export async function setBountyOnIssue(
     const issueIdBytes32 = stringToBytes32(issueId);
     
     // Convert amount to Wei (assuming 18 decimals)
-    const amountWei = ethers.utils.parseUnits(amount.toString(), 18);
+    const amountWei = ethers.parseUnits(amount.toString(), 18);
     
     // Call the contract method
     const tx = await contract.createBounty(repoIdBytes32, issueIdBytes32, amountWei);
     const receipt = await tx.wait();
     
-    return receipt.transactionHash;
+    return receipt.hash;
   } catch (error) {
     console.error("Error setting bounty on issue:", error);
     throw error;
@@ -163,7 +163,7 @@ export async function claimBounty(
     const tx = await contract.claimBounty(issueIdBytes32);
     const receipt = await tx.wait();
     
-    return receipt.transactionHash;
+    return receipt.hash;
   } catch (error) {
     console.error("Error claiming bounty:", error);
     throw error;
@@ -182,7 +182,7 @@ export async function completeBounty(
     const tx = await contract.completeBounty(issueIdBytes32);
     const receipt = await tx.wait();
     
-    return receipt.transactionHash;
+    return receipt.hash;
   } catch (error) {
     console.error("Error completing bounty:", error);
     throw error;
