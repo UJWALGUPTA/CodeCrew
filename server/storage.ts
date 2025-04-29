@@ -5,6 +5,8 @@ import {
   issues, type Issue, type InsertIssue,
   claims, type Claim, type InsertClaim
 } from "@shared/schema";
+import { db } from "./db";
+import { eq, and, desc } from "drizzle-orm";
 
 // Interface for all storage methods
 export interface IStorage {
@@ -422,4 +424,179 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// Database storage implementation
+export class DatabaseStorage implements IStorage {
+  // User methods
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
+  }
+
+  async getUserByGithubId(githubId: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.githubId, githubId));
+    return user || undefined;
+  }
+
+  async getUserByWalletAddress(walletAddress: string): Promise<User | undefined> {
+    if (!walletAddress) return undefined;
+    const [user] = await db.select().from(users).where(eq(users.walletAddress, walletAddress));
+    return user || undefined;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db.insert(users).values(insertUser).returning();
+    return user;
+  }
+
+  async updateUser(id: number, updates: Partial<User>): Promise<User | undefined> {
+    const [user] = await db.update(users)
+      .set({...updates, updatedAt: new Date()})
+      .where(eq(users.id, id))
+      .returning();
+    return user || undefined;
+  }
+
+  // Repository methods
+  async getRepository(id: number): Promise<Repository | undefined> {
+    const [repo] = await db.select().from(repositories).where(eq(repositories.id, id));
+    return repo || undefined;
+  }
+
+  async getRepositoryByFullName(fullName: string): Promise<Repository | undefined> {
+    const [repo] = await db.select().from(repositories).where(eq(repositories.fullName, fullName));
+    return repo || undefined;
+  }
+
+  async listRepositories(): Promise<Repository[]> {
+    return db.select().from(repositories).orderBy(repositories.createdAt);
+  }
+
+  async listUserRepositories(ownerId: number): Promise<Repository[]> {
+    // In a real implementation, this would filter by repositories the user owns or has access to
+    return this.listRepositories();
+  }
+
+  async createRepository(insertRepo: InsertRepository): Promise<Repository> {
+    const [repo] = await db.insert(repositories).values(insertRepo).returning();
+    return repo;
+  }
+
+  async updateRepository(id: number, updates: Partial<Repository>): Promise<Repository | undefined> {
+    const [repo] = await db.update(repositories)
+      .set({...updates, updatedAt: new Date()})
+      .where(eq(repositories.id, id))
+      .returning();
+    return repo || undefined;
+  }
+
+  // Pool methods
+  async getPool(id: number): Promise<Pool | undefined> {
+    const [pool] = await db.select().from(pools).where(eq(pools.id, id));
+    return pool || undefined;
+  }
+
+  async getPoolByRepository(repositoryId: number): Promise<Pool | undefined> {
+    const [pool] = await db.select().from(pools).where(eq(pools.repositoryId, repositoryId));
+    return pool || undefined;
+  }
+
+  async createPool(insertPool: InsertPool): Promise<Pool> {
+    const [pool] = await db.insert(pools).values(insertPool).returning();
+    return pool;
+  }
+
+  async updatePool(id: number, updates: Partial<Pool>): Promise<Pool | undefined> {
+    const [pool] = await db.update(pools)
+      .set({...updates, updatedAt: new Date()})
+      .where(eq(pools.id, id))
+      .returning();
+    return pool || undefined;
+  }
+
+  // Issue methods
+  async getIssue(id: number): Promise<Issue | undefined> {
+    const [issue] = await db.select().from(issues).where(eq(issues.id, id));
+    return issue || undefined;
+  }
+
+  async getIssueByRepoAndNumber(repositoryId: number, issueNumber: number): Promise<Issue | undefined> {
+    const [issue] = await db.select().from(issues).where(
+      and(
+        eq(issues.repositoryId, repositoryId),
+        eq(issues.issueNumber, issueNumber)
+      )
+    );
+    return issue || undefined;
+  }
+
+  async listIssues(filter?: { repositoryId?: number, hasBounty?: boolean }): Promise<Issue[]> {
+    let query = db.select().from(issues);
+    
+    if (filter) {
+      if (filter.repositoryId !== undefined) {
+        query = query.where(eq(issues.repositoryId, filter.repositoryId));
+      }
+      
+      if (filter.hasBounty !== undefined) {
+        query = query.where(eq(issues.hasBounty, filter.hasBounty));
+      }
+    }
+    
+    return query.orderBy(desc(issues.createdAt));
+  }
+
+  async createIssue(insertIssue: InsertIssue): Promise<Issue> {
+    const [issue] = await db.insert(issues).values(insertIssue).returning();
+    return issue;
+  }
+
+  async updateIssue(id: number, updates: Partial<Issue>): Promise<Issue | undefined> {
+    const [issue] = await db.update(issues)
+      .set({...updates, updatedAt: new Date()})
+      .where(eq(issues.id, id))
+      .returning();
+    return issue || undefined;
+  }
+
+  // Claim methods
+  async getClaim(id: number): Promise<Claim | undefined> {
+    const [claim] = await db.select().from(claims).where(eq(claims.id, id));
+    return claim || undefined;
+  }
+
+  async getClaimByUserAndIssue(userId: number, issueId: number): Promise<Claim | undefined> {
+    const [claim] = await db.select().from(claims).where(
+      and(
+        eq(claims.userId, userId),
+        eq(claims.issueId, issueId)
+      )
+    );
+    return claim || undefined;
+  }
+
+  async listUserClaims(userId: number): Promise<Claim[]> {
+    return db.select().from(claims)
+      .where(eq(claims.userId, userId))
+      .orderBy(desc(claims.createdAt));
+  }
+
+  async createClaim(insertClaim: InsertClaim): Promise<Claim> {
+    const [claim] = await db.insert(claims).values(insertClaim).returning();
+    return claim;
+  }
+
+  async updateClaim(id: number, updates: Partial<Claim>): Promise<Claim | undefined> {
+    const [claim] = await db.update(claims)
+      .set({...updates, updatedAt: new Date()})
+      .where(eq(claims.id, id))
+      .returning();
+    return claim || undefined;
+  }
+}
+
+export const storage = new DatabaseStorage();

@@ -1,5 +1,6 @@
-import { pgTable, text, serial, integer, boolean, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, foreignKey } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
+import { relations } from "drizzle-orm";
 import { z } from "zod";
 
 // Users table
@@ -105,6 +106,31 @@ export const insertClaimSchema = createInsertSchema(claims).omit({
   createdAt: true,
   updatedAt: true,
 });
+
+// Define relations
+export const usersRelations = relations(users, ({ many }) => ({
+  claims: many(claims),
+}));
+
+export const repositoriesRelations = relations(repositories, ({ one, many }) => ({
+  pool: one(pools, { fields: [repositories.id], references: [pools.repositoryId] }),
+  issues: many(issues),
+}));
+
+export const poolsRelations = relations(pools, ({ one }) => ({
+  repository: one(repositories, { fields: [pools.repositoryId], references: [repositories.id] }),
+  manager: one(users, { fields: [pools.managerId], references: [users.id] }),
+}));
+
+export const issuesRelations = relations(issues, ({ one, many }) => ({
+  repository: one(repositories, { fields: [issues.repositoryId], references: [repositories.id] }),
+  claims: many(claims),
+}));
+
+export const claimsRelations = relations(claims, ({ one }) => ({
+  user: one(users, { fields: [claims.userId], references: [users.id] }),
+  issue: one(issues, { fields: [claims.issueId], references: [issues.id] }),
+}));
 
 // Export types
 export type User = typeof users.$inferSelect;
