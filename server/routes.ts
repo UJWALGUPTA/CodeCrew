@@ -3,6 +3,14 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { githubClient } from "./github";
 import { web3Client } from "./web3";
+import session from "express-session";
+
+// Extend the Express Request type to include session
+declare module "express-session" {
+  interface SessionData {
+    userId?: number;
+  }
+}
 
 // Authentication middleware
 const isAuthenticated = (req: Request, res: Response, next: Function) => {
