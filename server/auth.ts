@@ -11,10 +11,18 @@ declare module "express-session" {
 }
 
 // GitHub OAuth Configuration
-// In a real application, these would be environment variables
-const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID || "your_github_client_id";
-const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET || "your_github_client_secret";
-const GITHUB_CALLBACK_URL = process.env.GITHUB_CALLBACK_URL || "http://localhost:5000/api/auth/github/callback";
+const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
+const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
+
+// Dynamically determine the callback URL based on the environment
+const getBaseUrl = () => {
+  if (process.env.REPL_ID && process.env.REPL_SLUG && process.env.REPL_OWNER) {
+    return `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`;
+  }
+  return 'http://localhost:5000';
+};
+
+const GITHUB_CALLBACK_URL = `${getBaseUrl()}/api/auth/github/callback`;
 
 export const startGithubOAuth = (req: Request, res: Response) => {
   // Create a random state to prevent CSRF attacks

@@ -60,29 +60,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(true);
     
     try {
-      // For this project, we'll simulate the GitHub OAuth flow
-      // In a real implementation, this would redirect to GitHub
-      
-      // Simulate successful login with mock data
-      const mockUser: User = {
-        id: 1,
-        username: "johndoe",
-        email: "john.doe@example.com",
-        avatar: "https://avatars.githubusercontent.com/u/1234567",
-        githubId: "johndoe123",
-      };
-      
-      // In a real implementation, this would be retrieved from the server
-      // after GitHub OAuth flow completion
-      setUser(mockUser);
-      
-      toast({
-        title: "Authentication Successful",
-        description: "You have been logged in successfully.",
-      });
-      
-      // Redirect to home page after login
-      setLocation("/");
+      // Redirect to GitHub OAuth route
+      window.location.href = "/api/auth/github";
     } catch (error) {
       console.error("Login error:", error);
       toast({
@@ -90,7 +69,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         description: "There was an error logging in. Please try again.",
         variant: "destructive",
       });
-    } finally {
       setIsLoading(false);
     }
   };

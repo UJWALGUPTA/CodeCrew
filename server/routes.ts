@@ -45,9 +45,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/auth/github", startGithubOAuth);
   app.get("/api/auth/github/callback", handleGithubCallback);
 
-  // For development/testing purposes, keep the simple login
+  // Logout route  
+  app.post("/api/auth/logout", logoutUser);
+  
+  // For development/testing purposes in case GitHub OAuth isn't available
   app.post("/api/auth/login", async (req: Request, res: Response) => {
-    // In a real implementation, this would process an OAuth callback from GitHub
+    // This is a fallback login route for testing
     // For this project, we simulate a successful login
     try {
       // Find an existing user or create a new one
@@ -77,8 +80,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Login failed" });
     }
   });
-
-  app.post("/api/auth/logout", logoutUser);
 
   // -------------------- GitHub Routes --------------------
 
