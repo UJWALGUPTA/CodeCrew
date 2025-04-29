@@ -15,7 +15,7 @@ const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
 const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
 
 // Use a fixed callback URL that matches exactly what's registered in the GitHub OAuth app
-const GITHUB_CALLBACK_URL = "https://workspace.ujwal2.repl.co/api/auth/github/callback";
+const GITHUB_CALLBACK_URL = "https://7022de56-086f-4518-b706-fd8819d43438-00-krucavyhvoiv.worf.replit.dev/api/auth/github/callback";
 
 export const startGithubOAuth = (req: Request, res: Response) => {
   // Create a random state to prevent CSRF attacks
