@@ -39,28 +39,28 @@ export const handleGithubCallback = async (req: Request, res: Response) => {
   
   try {
     // Exchange code for access token
-    // In a real app, we would call GitHub's API to exchange the code for a token
-    // For this simulation, we'll mock the token exchange
+    const tokenResponse = await fetch("https://github.com/login/oauth/access_token", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify({
+        client_id: GITHUB_CLIENT_ID,
+        client_secret: GITHUB_CLIENT_SECRET,
+        code,
+        redirect_uri: GITHUB_CALLBACK_URL
+      })
+    });
     
-    // To implement the real exchange:
-    // const tokenResponse = await fetch("https://github.com/login/oauth/access_token", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //     "Accept": "application/json"
-    //   },
-    //   body: JSON.stringify({
-    //     client_id: GITHUB_CLIENT_ID,
-    //     client_secret: GITHUB_CLIENT_SECRET,
-    //     code,
-    //     redirect_uri: GITHUB_CALLBACK_URL
-    //   })
-    // });
-    // const tokenData = await tokenResponse.json();
-    // const accessToken = tokenData.access_token;
+    const tokenData = await tokenResponse.json();
     
-    // For this demo, we'll use a mock access token
-    const accessToken = "mock_github_token";
+    if (tokenData.error) {
+      console.error("GitHub OAuth error:", tokenData.error);
+      return res.status(400).json({ message: tokenData.error_description || "Authentication failed" });
+    }
+    
+    const accessToken = tokenData.access_token;
     
     // Get user data from GitHub
     const userData = await githubClient.getUserData(accessToken);

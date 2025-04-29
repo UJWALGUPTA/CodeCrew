@@ -4,35 +4,37 @@ import { storage } from "./storage";
 // In a real implementation, this would use the GitHub API via a library like octokit
 class GitHubClient {
   async getUserData(accessToken: string) {
-    // In a real implementation, this would call the GitHub API
-    // For this project, we'll return mock data
-    return {
-      login: "johndoe",
-      id: 12345,
-      avatar_url: "https://avatars.githubusercontent.com/u/12345",
-      name: "John Doe",
-      email: "john.doe@example.com",
-    };
+    const response = await fetch("https://api.github.com/user", {
+      headers: {
+        Authorization: `token ${accessToken}`,
+        Accept: "application/vnd.github.v3+json"
+      }
+    });
+    
+    if (!response.ok) {
+      const error = await response.text();
+      console.error("GitHub API error:", error);
+      throw new Error(`GitHub API error: ${response.status}`);
+    }
+    
+    return response.json();
   }
 
   async getUserRepositories(accessToken: string) {
-    // In a real implementation, this would call the GitHub API
-    // For this project, we'll return repositories from our database
-    const repositories = await storage.listRepositories();
-    return repositories.map(repo => ({
-      id: repo.id,
-      name: repo.name,
-      full_name: repo.fullName,
-      description: repo.description,
-      html_url: repo.url,
-      owner: {
-        login: repo.owner,
-      },
-      private: repo.isPrivate,
-      stars: repo.stars,
-      forks: repo.forks,
-      open_issues: repo.openIssues,
-    }));
+    const response = await fetch("https://api.github.com/user/repos?sort=updated&per_page=100", {
+      headers: {
+        Authorization: `token ${accessToken}`,
+        Accept: "application/vnd.github.v3+json"
+      }
+    });
+    
+    if (!response.ok) {
+      const error = await response.text();
+      console.error("GitHub API error:", error);
+      throw new Error(`GitHub API error: ${response.status}`);
+    }
+    
+    return response.json();
   }
 
   async getRepositoryIssues(owner: string, repo: string, accessToken: string) {
