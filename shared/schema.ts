@@ -12,6 +12,8 @@ export const users = pgTable("users", {
   avatarUrl: text("avatar_url"),
   accessToken: text("access_token"),
   walletAddress: text("wallet_address"),
+  role: text("role").default("contributor").notNull(), // 'contributor' or 'pool_manager'
+  tokenBalance: integer("token_balance").default(1000), // Default 1000 tokens for users
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

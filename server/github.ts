@@ -1,8 +1,161 @@
 import { storage } from "./storage";
+import * as crypto from 'crypto';
+import * as jwt from 'jsonwebtoken';
 
-// This is a mock GitHub client for the ROXONN project
-// In a real implementation, this would use the GitHub API via a library like octokit
+// GitHub client for the ROXONN project - enhanced with GitHub App support
 class GitHubClient {
+  private appId: string;
+  private privateKey: string;
+  private webhookSecret: string;
+  
+  constructor() {
+    // Set up GitHub App credentials
+    this.appId = process.env.GITHUB_APP_ID || '';
+    this.privateKey = process.env.GITHUB_APP_PRIVATE_KEY?.replace(/\\n/g, '\n') || '';
+    this.webhookSecret = process.env.GITHUB_WEBHOOK_SECRET || '';
+    
+    if (!this.appId || !this.privateKey || !this.webhookSecret) {
+      console.warn('GitHub App credentials missing. Some functionality may not work.');
+    }
+  }
+  
+  /**
+   * Generate a JWT for GitHub App authentication
+   */
+  private generateJWT(): string {
+    const now = Math.floor(Date.now() / 1000);
+    const payload = {
+      iat: now - 60, // Issued 60 seconds in the past to allow for clock drift
+      exp: now + (10 * 60), // Expires in 10 minutes
+      iss: this.appId
+    };
+    
+    return jwt.sign(payload, this.privateKey, { algorithm: 'RS256' });
+  }
+  
+  /**
+   * Get an installation access token for a specific repository installation
+   */
+  async getInstallationToken(installationId: number): Promise<string> {
+    const jwt = this.generateJWT();
+    
+    const response = await fetch(`https://api.github.com/app/installations/${installationId}/access_tokens`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${jwt}`,
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    });
+    
+    if (!response.ok) {
+      const error = await response.text();
+      console.error("GitHub API error:", error);
+      throw new Error(`GitHub API error: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data.token;
+  }
+  
+  /**
+   * Get the installation ID for a repository
+   */
+  async getInstallationIdForRepo(owner: string, repo: string): Promise<number> {
+    const jwt = this.generateJWT();
+    
+    const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/installation`, {
+      headers: {
+        'Authorization': `Bearer ${jwt}`,
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    });
+    
+    if (!response.ok) {
+      const error = await response.text();
+      console.error("GitHub API error:", error);
+      throw new Error(`GitHub API error: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data.id;
+  }
+  
+  /**
+   * Verify the signature of a webhook payload
+   */
+  verifyWebhookSignature(payload: string, signatureHeader: string): boolean {
+    if (!signatureHeader || !this.webhookSecret) return false;
+    
+    const signature = Buffer.from(signatureHeader.replace('sha256=', ''), 'hex');
+    const hmac = crypto.createHmac('sha256', this.webhookSecret);
+    const digest = Buffer.from(hmac.update(payload).digest('hex'), 'hex');
+    
+    if (signature.length !== digest.length) return false;
+    
+    return crypto.timingSafeEqual(signature, digest);
+  }
+  
+  /**
+   * Add a comment to an issue as the GitHub App
+   */
+  async addIssueComment(owner: string, repo: string, issueNumber: number, comment: string): Promise<any> {
+    try {
+      const installationId = await this.getInstallationIdForRepo(owner, repo);
+      const token = await this.getInstallationToken(installationId);
+      
+      const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/issues/${issueNumber}/comments`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `token ${token}`,
+          'Accept': 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ body: comment })
+      });
+      
+      if (!response.ok) {
+        const error = await response.text();
+        console.error("GitHub API error:", error);
+        throw new Error(`GitHub API error: ${response.status}`);
+      }
+      
+      return response.json();
+    } catch (error) {
+      console.error("Failed to add comment:", error);
+      throw error;
+    }
+  }
+  
+  /**
+   * Add a label to an issue as the GitHub App
+   */
+  async addIssueLabel(owner: string, repo: string, issueNumber: number, labels: string[]): Promise<any> {
+    try {
+      const installationId = await this.getInstallationIdForRepo(owner, repo);
+      const token = await this.getInstallationToken(installationId);
+      
+      const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/issues/${issueNumber}/labels`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `token ${token}`,
+          'Accept': 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ labels })
+      });
+      
+      if (!response.ok) {
+        const error = await response.text();
+        console.error("GitHub API error:", error);
+        throw new Error(`GitHub API error: ${response.status}`);
+      }
+      
+      return response.json();
+    } catch (error) {
+      console.error("Failed to add labels:", error);
+      throw error;
+    }
+  }
   async getUserData(accessToken: string) {
     const response = await fetch("https://api.github.com/user", {
       headers: {
@@ -76,10 +229,11 @@ class GitHubClient {
     };
   }
 
-  async verifyWebhookSignature(payload: any, signature: string, secret: string) {
-    // In a real implementation, this would verify the webhook signature
-    // For this project, we'll always return true
-    return true;
+  // This method is deprecated and kept for backward compatibility
+  async verifyWebhookSignatureOld(payload: any, signature: string, secret: string) {
+    console.warn("Using deprecated verifyWebhookSignature method, consider upgrading to the new version");
+    // For backward compatibility, defer to the new signature verification method
+    return this.verifyWebhookSignature(JSON.stringify(payload), signature);
   }
 
   async getIssue(owner: string, repo: string, issueNumber: number, accessToken: string) {

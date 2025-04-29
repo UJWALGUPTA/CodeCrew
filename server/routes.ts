@@ -1,10 +1,11 @@
-import type { Express, Request, Response, NextFunction } from "express";
+import express, { type Express, type Request, type Response, type NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { githubClient } from "./github";
 import { web3Client } from "./web3";
 import session from "express-session";
 import { startGithubOAuth, handleGithubCallback, logoutUser } from "./auth";
+import * as crypto from "crypto";
 
 // Authentication middleware
 const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
@@ -495,6 +496,420 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // -------------------- GitHub App Webhook --------------------
+  
+  app.post("/api/github/webhook", express.raw({ type: 'application/json' }), async (req: Request, res: Response) => {
+    const signature = req.headers['x-hub-signature-256'] as string;
+    const event = req.headers['x-github-event'] as string;
+    const delivery = req.headers['x-github-delivery'] as string;
+    
+    // Parse raw body as we're using express.raw middleware for this route
+    const payload = req.body.toString('utf8');
+    
+    console.log(`Received GitHub webhook: ${event} (${delivery})`);
+    
+    // Verify webhook signature
+    if (!githubClient.verifyWebhookSignature(payload, signature)) {
+      console.warn('Invalid webhook signature');
+      return res.status(401).json({ message: 'Invalid signature' });
+    }
+    
+    try {
+      // Parse the payload as JSON now that we've verified the signature
+      const data = JSON.parse(payload);
+      
+      // Handle different event types
+      switch (event) {
+        case 'issues':
+          await handleIssueEvent(data);
+          break;
+        case 'issue_comment':
+          await handleIssueCommentEvent(data);
+          break;
+        case 'pull_request':
+          await handlePullRequestEvent(data);
+          break;
+        default:
+          console.log(`Unhandled event type: ${event}`);
+      }
+      
+      res.status(200).json({ message: 'Webhook processed' });
+    } catch (error) {
+      console.error('Error processing webhook:', error);
+      res.status(500).json({ message: 'Error processing webhook' });
+    }
+  });
+  
+  // Webhook event handlers
+  async function handleIssueEvent(data: any) {
+    const action = data.action;
+    const issue = data.issue;
+    const repository = data.repository;
+    
+    console.log(`Issue ${action}: #${issue.number} in ${repository.full_name}`);
+    
+    // Find the repository in our database, or create it if it doesn't exist
+    let repo = await storage.getRepositoryByFullName(repository.full_name);
+    
+    if (!repo) {
+      // Repository doesn't exist in our database, create it
+      repo = await storage.createRepository({
+        name: repository.name,
+        owner: repository.owner.login,
+        fullName: repository.full_name,
+        description: repository.description,
+        url: repository.html_url,
+        stars: repository.stargazers_count,
+        forks: repository.forks_count,
+        openIssues: repository.open_issues_count,
+        isPrivate: repository.private,
+      });
+    }
+    
+    // Check if issue exists in our database
+    let dbIssue = await storage.getIssueByRepoAndNumber(repo.id, issue.number);
+    
+    // Handle based on action
+    switch (action) {
+      case 'opened':
+      case 'edited':
+      case 'labeled':
+      case 'unlabeled':
+        // Extract the issue type from labels
+        let type = 'enhancement'; // Default
+        if (issue.labels && issue.labels.length > 0) {
+          if (issue.labels.some(label => label.name === 'bug')) {
+            type = 'bug';
+          } else if (issue.labels.some(label => label.name === 'documentation')) {
+            type = 'docs';
+          } else if (issue.labels.some(label => label.name === 'feature')) {
+            type = 'feature';
+          }
+        }
+        
+        if (!dbIssue) {
+          // Create new issue
+          dbIssue = await storage.createIssue({
+            repositoryId: repo.id,
+            issueNumber: issue.number,
+            title: issue.title,
+            description: issue.body,
+            url: issue.html_url,
+            state: issue.state,
+            type,
+            hasBounty: false,
+            reward: 0,
+            bountyAddedAt: null,
+          });
+        } else {
+          // Update existing issue
+          dbIssue = await storage.updateIssue(dbIssue.id, {
+            title: issue.title,
+            description: issue.body,
+            state: issue.state,
+            type,
+          });
+        }
+        break;
+        
+      case 'closed':
+        if (dbIssue) {
+          // Update state to closed
+          await storage.updateIssue(dbIssue.id, {
+            state: 'closed',
+          });
+          
+          // If this issue has a bounty and an active claim, we might want to trigger the payment process
+          if (dbIssue.hasBounty) {
+            // In a real implementation, this might involve checking if there's a claim,
+            // verifying the PR was merged, and then triggering a blockchain transaction
+            console.log(`Issue #${issue.number} with bounty was closed. Should check for claims.`);
+          }
+        }
+        break;
+        
+      case 'reopened':
+        if (dbIssue) {
+          // Update state to open
+          await storage.updateIssue(dbIssue.id, {
+            state: 'open',
+          });
+        }
+        break;
+    }
+  }
+  
+  async function handleIssueCommentEvent(data: any) {
+    const action = data.action;
+    const issue = data.issue;
+    const comment = data.comment;
+    const repository = data.repository;
+    
+    console.log(`Comment ${action} on issue #${issue.number} in ${repository.full_name}`);
+    
+    // Check if this is a command comment (e.g. starting with !roxonn)
+    if (comment.body.startsWith('!roxonn')) {
+      const parts = comment.body.split(' ');
+      const command = parts[1]?.toLowerCase();
+      
+      if (command === 'claim') {
+        // A contributor is claiming the issue
+        // Find the repository and issue
+        const repo = await storage.getRepositoryByFullName(repository.full_name);
+        if (!repo) return;
+        
+        const dbIssue = await storage.getIssueByRepoAndNumber(repo.id, issue.number);
+        if (!dbIssue) return;
+        
+        // Find the user by GitHub username
+        const username = comment.user.login;
+        let user = await storage.getUserByUsername(username);
+        
+        if (!user) {
+          // Create a new user
+          user = await storage.createUser({
+            username,
+            githubId: comment.user.id.toString(),
+            email: null,
+            avatarUrl: comment.user.avatar_url,
+            accessToken: null,
+            walletAddress: null,
+            role: 'contributor',
+            tokenBalance: 1000, // Default token balance
+          });
+        }
+        
+        // Check if user has already claimed this issue
+        const existingClaim = await storage.getClaimByUserAndIssue(user.id, dbIssue.id);
+        if (existingClaim) {
+          // Already claimed, perhaps post a comment via the GitHub API
+          await githubClient.addIssueComment(
+            repo.owner,
+            repo.name,
+            issue.number,
+            `@${username} You've already claimed this issue.`
+          );
+          return;
+        }
+        
+        // Create a new claim
+        await storage.createClaim({
+          userId: user.id,
+          issueId: dbIssue.id,
+          status: 'claimed',
+          prUrl: null,
+          prNumber: null,
+          transactionHash: null,
+          completedAt: null,
+        });
+        
+        // Post a confirmation comment
+        await githubClient.addIssueComment(
+          repo.owner,
+          repo.name,
+          issue.number,
+          `@${username} You've successfully claimed this issue!`
+        );
+        
+        // Add a label to the issue
+        await githubClient.addIssueLabel(
+          repo.owner,
+          repo.name,
+          issue.number,
+          ['claimed']
+        );
+      }
+      else if (command === 'bounty' && parts.length >= 3) {
+        // A pool manager is setting a bounty
+        const amount = parseInt(parts[2]);
+        
+        if (isNaN(amount) || amount <= 0) {
+          return;
+        }
+        
+        // Find the repository and issue
+        const repo = await storage.getRepositoryByFullName(repository.full_name);
+        if (!repo) return;
+        
+        const dbIssue = await storage.getIssueByRepoAndNumber(repo.id, issue.number);
+        if (!dbIssue) return;
+        
+        // Find the user by GitHub username
+        const username = comment.user.login;
+        let user = await storage.getUserByUsername(username);
+        
+        if (!user) {
+          // Create a new user
+          user = await storage.createUser({
+            username,
+            githubId: comment.user.id.toString(),
+            email: null,
+            avatarUrl: comment.user.avatar_url,
+            accessToken: null,
+            walletAddress: null,
+            role: 'pool_manager', // Assign as pool manager
+            tokenBalance: 1000, // Default token balance
+          });
+        }
+        
+        // Check if pool exists or create one
+        let pool = await storage.getPoolByRepository(repo.id);
+        
+        if (!pool) {
+          // Create a new pool
+          pool = await storage.createPool({
+            repositoryId: repo.id,
+            managerId: user.id,
+            balance: amount,
+            dailyDeposited: amount,
+            lastDepositTime: new Date(),
+            isActive: true,
+            contractAddress: null,
+          });
+        }
+        
+        // Set the bounty on the issue
+        await storage.updateIssue(dbIssue.id, {
+          hasBounty: true,
+          reward: amount,
+          bountyAddedAt: new Date(),
+        });
+        
+        // Post a confirmation comment
+        await githubClient.addIssueComment(
+          repo.owner,
+          repo.name,
+          issue.number,
+          `@${username} has set a bounty of ${amount} ROXN tokens for this issue!`
+        );
+        
+        // Add a label to the issue
+        await githubClient.addIssueLabel(
+          repo.owner,
+          repo.name,
+          issue.number,
+          ['bounty']
+        );
+      }
+    }
+  }
+  
+  async function handlePullRequestEvent(data: any) {
+    const action = data.action;
+    const pr = data.pull_request;
+    const repository = data.repository;
+    
+    console.log(`PR ${action}: #${pr.number} in ${repository.full_name}`);
+    
+    // Find the repository in our database
+    const repo = await storage.getRepositoryByFullName(repository.full_name);
+    if (!repo) return;
+    
+    // Extract the issue number from the PR description or title
+    // This assumes the PR contains "Fixes #123" or similar in description
+    let issueNumber = null;
+    const fixesRegex = /(?:fixes|closes|resolves)\s+#(\d+)/i;
+    
+    let match = pr.body?.match(fixesRegex);
+    if (!match) {
+      match = pr.title.match(fixesRegex);
+    }
+    
+    if (match && match[1]) {
+      issueNumber = parseInt(match[1]);
+    }
+    
+    if (!issueNumber) {
+      console.log('Could not determine related issue number from PR');
+      return;
+    }
+    
+    // Find the issue and any claims
+    const issue = await storage.getIssueByRepoAndNumber(repo.id, issueNumber);
+    if (!issue) return;
+    
+    // Find the user who opened the PR
+    const username = pr.user.login;
+    let user = await storage.getUserByUsername(username);
+    
+    if (!user) {
+      // Create a new user
+      user = await storage.createUser({
+        username,
+        githubId: pr.user.id.toString(),
+        email: null,
+        avatarUrl: pr.user.avatar_url,
+        accessToken: null,
+        walletAddress: null,
+        role: 'contributor',
+        tokenBalance: 1000, // Default token balance
+      });
+    }
+    
+    // Find if this user has claimed the issue
+    let claim = await storage.getClaimByUserAndIssue(user.id, issue.id);
+    
+    switch (action) {
+      case 'opened':
+      case 'reopened':
+        // If there's no claim but the PR is linked to an issue with a bounty,
+        // we might want to automatically create a claim
+        if (!claim && issue.hasBounty) {
+          claim = await storage.createClaim({
+            userId: user.id,
+            issueId: issue.id,
+            status: 'submitted',
+            prUrl: pr.html_url,
+            prNumber: pr.number,
+            transactionHash: null,
+            completedAt: null,
+          });
+          
+          // Add a comment to the PR
+          await githubClient.addIssueComment(
+            repo.owner,
+            repo.name,
+            pr.number,
+            `Thanks for submitting a PR for issue #${issueNumber}, which has a bounty of ${issue.reward} ROXN tokens!`
+          );
+        } else if (claim) {
+          // Update the existing claim with PR info
+          await storage.updateClaim(claim.id, {
+            status: 'submitted',
+            prUrl: pr.html_url,
+            prNumber: pr.number,
+          });
+        }
+        break;
+        
+      case 'closed':
+        if (pr.merged && claim) {
+          // The PR was merged, complete the claim
+          await storage.updateClaim(claim.id, {
+            status: 'approved',
+            completedAt: new Date(),
+          });
+          
+          // In a real implementation, this would trigger a blockchain transaction
+          // to transfer the bounty to the user's wallet
+          
+          // Add a comment to the PR
+          await githubClient.addIssueComment(
+            repo.owner,
+            repo.name,
+            pr.number,
+            `Congratulations! Your PR has been merged and the bounty of ${issue.reward} ROXN tokens will be transferred to your wallet.`
+          );
+        } else if (!pr.merged && claim) {
+          // The PR was closed without merging
+          await storage.updateClaim(claim.id, {
+            status: 'rejected',
+          });
+        }
+        break;
+    }
+  }
+  
   // -------------------- Dashboard Routes --------------------
 
   app.get("/api/dashboard", isAuthenticated, async (req: Request, res: Response) => {
