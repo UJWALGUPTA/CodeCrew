@@ -46,7 +46,7 @@ export default function Home() {
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col space-y-1">
                 <span className="text-muted-foreground text-xs">Total Earnings</span>
-                <span className="text-2xl font-bold text-purple-400">{isLoading ? <Skeleton className="h-8 w-20 bg-gray-800" /> : `${dashboardData?.totalEarnings || 0} ROXN`}</span>
+                <span className="text-2xl font-bold text-purple-400">{isLoading ? <Skeleton className="h-8 w-20 bg-gray-800" /> : `${dashboardData?.totalEarnings || 0} CREW`}</span>
               </div>
               <div className="flex flex-col space-y-1">
                 <span className="text-muted-foreground text-xs">Completed Bounties</span>
@@ -68,7 +68,7 @@ export default function Home() {
         <Card className="shadow-md hover:shadow-lg transition-shadow duration-200 border-purple-900/20 bg-slate-900 text-white">
           <CardHeader>
             <CardTitle>Quick Actions</CardTitle>
-            <CardDescription className="text-gray-400">Get started with ROXONN</CardDescription>
+            <CardDescription className="text-gray-400">Get started with CodeCrew</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <Button 
