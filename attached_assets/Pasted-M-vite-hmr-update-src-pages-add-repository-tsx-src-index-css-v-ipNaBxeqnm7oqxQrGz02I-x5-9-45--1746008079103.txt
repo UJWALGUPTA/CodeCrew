@@ -1,0 +1,50 @@
+M [vite] hmr update /src/pages/add-repository.tsx, /src/index.css?v=ipNaBxeqnm7oqxQrGz02I (x5)
+9:45:58 AM [express] GET /api/auth/me 401 in 1ms :: {"message":"Not authenticated"}
+9:46:05 AM [express] GET /api/auth/me 200 in 325ms :: {"id":1,"username":"UJWALGUPTA","githubId":"54…
+10:11:19 AM [express] GET /api/auth/me 304 in 938ms :: {"id":1,"username":"UJWALGUPTA","githubId":"54…
+Fetching sample repositories for development
+Returning mock repositories for development
+Returning 5 sample repositories to client (public endpoint)
+10:11:20 AM [express] GET /api/github/sample-repositories 304 in 0ms :: [{"id":1234567890,"name":"rea…
+Fetching sample repositories for development
+Returning mock repositories for development
+Returning 5 sample repositories to client (public endpoint)
+10:11:41 AM [express] GET /api/github/sample-repositories 304 in 1ms :: [{"id":1234567890,"name":"rea…
+Fetching sample repositories for development
+Returning mock repositories for development
+Returning 5 sample repositories to client (public endpoint)
+10:11:41 AM [express] GET /api/github/sample-repositories 304 in 1ms :: [{"id":1234567890,"name":"rea…
+Setting up webhook for sample-user/react-ui-components to http://7022de56-086f-4518-b706-fd8819d43438-00-krucavyhvoiv.worf.replit.dev/api/github/webhook
+Error creating webhook: Error: GitHub API error: 404 {"message":"Not Found","documentation_url":"https://docs.github.com/rest/repos/webhooks#list-repository-webhooks","status":"404"}
+    at GitHubClient.createWebhook (/home/runner/workspace/server/github.ts:334:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:205:11)
+Failed to create webhook for sample-user/react-ui-components: Error: Failed to create webhook: GitHub API error: 404 {"message":"Not Found","documentation_url":"https://docs.github.com/rest/repos/webhooks#list-repository-webhooks","status":"404"}
+    at GitHubClient.createWebhook (/home/runner/workspace/server/github.ts:376:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:205:11)
+10:11:45 AM [express] POST /api/repositories 201 in 618ms :: {"id":1,"owner":"sample-user","name":"re…
+Error funding repository undefined: error: invalid input syntax for type integer: "NaN"
+    at file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1345:74
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-serverless/session.ts:102:18)
+    at async DatabaseStorage.getPoolByRepository (/home/runner/workspace/server/storage.ts:504:20)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:274:18) {
+  length: 146,
+  severity: 'ERROR',
+  code: '22P02',
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: "unnamed portal parameter $1 = '...'",
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'numutils.c',
+  line: '617',
+  routine: 'pg_strtoint32_safe'
+}

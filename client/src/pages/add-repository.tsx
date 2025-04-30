@@ -61,11 +61,11 @@ export default function AddRepository() {
 
   // Fetch GitHub repositories
   const { data: githubRepos = [], isLoading: isLoadingRepos, refetch: refetchRepos, error: reposError } = useQuery<Repository[]>({
-    queryKey: ["/api/github/sample-repositories"], // Using our public sample repos endpoint
+    queryKey: ["/api/github/repositories"], // Use authenticated repository endpoint
     queryFn: async () => {
-      console.log("Fetching repositories from sample endpoint");
+      console.log("Fetching repositories from GitHub");
       try {
-        const response = await fetch("/api/github/sample-repositories", {
+        const response = await fetch("/api/github/repositories", {
           credentials: "include",
           headers: {
             "Content-Type": "application/json"
@@ -78,14 +78,14 @@ export default function AddRepository() {
         }
         
         const data = await response.json();
-        console.log(`Received ${data.length} repositories from API:`, data);
+        console.log(`Received ${data.length} repositories from GitHub API:`, data);
         return data;
       } catch (error) {
         console.error("Error fetching repositories:", error);
         throw error;
       }
     },
-    enabled: true, // Always fetch sample repos
+    enabled: isGithubConnected, // Only fetch when GitHub is connected
     staleTime: 1000 * 60 * 5, // 5 minutes
     retry: 3,
     refetchOnWindowFocus: false
@@ -120,6 +120,13 @@ export default function AddRepository() {
         owner,
         url: values.repositoryUrl,
       });
+      
+      console.log("Repository created:", repository);
+      
+      // Check if we have a valid repository ID before trying to fund it
+      if (!repository || !repository.id) {
+        throw new Error("Repository was created but no ID was returned");
+      }
       
       // Then fund it
       await apiRequest("POST", `/api/repositories/${repository.id}/fund`, {
