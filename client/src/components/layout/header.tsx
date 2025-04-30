@@ -17,9 +17,9 @@ export default function Header() {
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex items-center space-x-2">
           <svg className="w-8 h-8 text-primary" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm2.5 18c-.667.5-1.5.5-2.5.5s-1.833 0-2.5-.5c-.5-.5-1-1.167-1-2.5 0-2 1.5-3 3.5-3s3.5 1 3.5 3c0 1.333-.5 2-1 2.5zm2.5-8c0 .827-.673 1.5-1.5 1.5S14 10.827 14 10s.673-1.5 1.5-1.5S17 9.173 17 10zm-8 0c0 .827-.673 1.5-1.5 1.5S6 10.827 6 10s.673-1.5 1.5-1.5S9 9.173 9 10z"/>
+            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 4.5c4.142 0 7.5 3.358 7.5 7.5 0 2.786-1.917 5.223-4.667 5.943v-3.943h1.917v-2h-1.917v-1.5c0-0.942 0.442-1.5 1.5-1.5h0.5v-2h-0.583c-1.978 0-3.23 1.305-3.23 3.25v1.75h-2.12v2h2.12v3.938c-2.737-0.729-4.642-3.161-4.642-5.938 0-4.142 3.358-7.5 7.5-7.5z"/>
           </svg>
-          <span className="text-xl font-bold neon-primary">ROXONN</span>
+          <span className="text-xl font-bold text-primary">CodeCrew</span>
         </div>
         
         <div className="flex items-center space-x-4">

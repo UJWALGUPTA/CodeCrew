@@ -4,41 +4,45 @@
 
 @layer base {
   :root {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --primary: 267 55% 52%; /* #6E40C9 - Base purple */
-    --primary-foreground: 211 100% 99%;
-    --secondary: 142 59% 36%; /* #238636 - Success green */
-    --secondary-foreground: 0 0% 98%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --ring: 240 4.9% 83.9%;
+    /* CodeCrew color schema */
+    --background: 222 18% 7%; /* #0D1117 */
+    --foreground: 210 40% 96%; /* #F1F5F9 */
+    --muted: 215 16% 15%; /* #1E2330 */
+    --muted-foreground: 215 20% 65%; /* #94A3B8 */
+    --popover: 215 21% 11%; /* #161B22 */
+    --popover-foreground: 210 40% 96%; /* #F1F5F9 */
+    --card: 215 21% 11%; /* #161B22 */
+    --card-foreground: 210 40% 96%; /* #F1F5F9 */
+    --border: 212 12% 21%; /* #30363D */
+    --input: 215 21% 11%; /* #161B22 */
+    --primary: 217 91% 60%; /* #3B82F6 - Primary Accent blue */
+    --primary-foreground: 210 40% 98%;
+    --secondary: 263 70% 63%; /* #8B5CF6 - Secondary Accent violet */
+    --secondary-foreground: 210 40% 98%;
+    --accent: 152 76% 40%; /* #10B981 - Success green */
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%; /* #EF4444 */
+    --destructive-foreground: 210 40% 98%;
+    --warning: 35 92% 50%; /* #F59E0B */
+    --ring: 217 91% 60%; /* Primary accent for focus rings */
     --radius: 0.5rem;
     
-    --chart-1: 267 55% 52%;
-    --chart-2: 142 59% 36%;
-    --chart-3: 45 93% 47%;
-    --chart-4: 0 84% 60%;
-    --chart-5: 217 91% 60%;
+    /* Chart colors */
+    --chart-1: 217 91% 60%; /* Primary accent blue */
+    --chart-2: 263 70% 63%; /* Secondary accent violet */
+    --chart-3: 152 76% 40%; /* Success green */
+    --chart-4: 35 92% 50%; /* Warning orange */
+    --chart-5: 0 84% 60%; /* Destructive red */
     
-    --sidebar-background: 240 10% 3.9%;
-    --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 267 55% 52%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 240 4.9% 83.9%;
+    /* Sidebar colors - matching the new CodeCrew schema */
+    --sidebar-background: 222 18% 7%; /* #0D1117 - Match background */
+    --sidebar-foreground: 210 40% 96%; /* #F1F5F9 - Match foreground */
+    --sidebar-primary: 217 91% 60%; /* #3B82F6 - Primary blue */
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 215 21% 11%; /* #161B22 - Match surface/card */
+    --sidebar-accent-foreground: 210 40% 96%; /* #F1F5F9 */
+    --sidebar-border: 212 12% 21%; /* #30363D - Match border */
+    --sidebar-ring: 217 91% 60%; /* Primary accent */
   }
 }
 
