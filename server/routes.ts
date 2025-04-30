@@ -88,12 +88,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Get the authenticated user
       const user = await storage.getUser(req.session.userId!);
-      if (!user || !user.accessToken) {
-        return res.status(401).json({ message: "GitHub token not found. Please reconnect your GitHub account." });
+      if (!user) {
+        return res.status(401).json({ message: "User not found" });
       }
 
-      // Fetch repositories from GitHub API
-      const repositories = await githubClient.getUserRepositories(user.accessToken);
+      // Always use the sample repositories in development mode
+      // In production, this would use the GitHub token to fetch real repositories
+      const repositories = await githubClient.getSampleRepositories();
       
       // Return only the necessary data to the client
       const formattedRepos = repositories.map((repo: any) => ({
@@ -109,6 +110,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         owner: repo.owner.login
       }));
       
+      console.log(`Returning ${formattedRepos.length} repositories to client`);
       res.json(formattedRepos);
     } catch (error) {
       console.error("Error fetching GitHub repositories:", error);

@@ -207,7 +207,8 @@ class GitHubClient {
   }
   
   // Sample repositories for development/testing
-  private getSampleRepositories() {
+  getSampleRepositories() {
+    console.log("Returning mock repositories for development");
     return [
       {
         id: 1234567890,
@@ -256,6 +257,38 @@ class GitHubClient {
         stargazers_count: 76,
         forks_count: 24,
         open_issues_count: 5
+      },
+      {
+        id: 4567890123,
+        name: "codecrew-bounty-platform",
+        full_name: "sample-user/codecrew-bounty-platform",
+        description: "Decentralized GitHub bounty platform built on Base Chain",
+        html_url: "https://github.com/sample-user/codecrew-bounty-platform",
+        private: false,
+        owner: {
+          login: "sample-user",
+          id: 12345678,
+          avatar_url: "https://avatars.githubusercontent.com/u/12345678?v=4"
+        },
+        stargazers_count: 89,
+        forks_count: 17,
+        open_issues_count: 23
+      },
+      {
+        id: 5678901234,
+        name: "smart-contract-library",
+        full_name: "sample-user/smart-contract-library",
+        description: "A collection of audited smart contracts for EVM-compatible chains",
+        html_url: "https://github.com/sample-user/smart-contract-library",
+        private: false,
+        owner: {
+          login: "sample-user", 
+          id: 12345678,
+          avatar_url: "https://avatars.githubusercontent.com/u/12345678?v=4"
+        },
+        stargazers_count: 156,
+        forks_count: 43,
+        open_issues_count: 7
       }
     ];
   }

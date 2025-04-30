@@ -60,7 +60,8 @@ export default function AddRepository() {
     queryKey: ["/api/github/repositories"],
     enabled: isGithubConnected,
     staleTime: 1000 * 60 * 5, // 5 minutes
-    retry: 3
+    retry: 3,
+    refetchOnWindowFocus: false
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
