@@ -23,14 +23,88 @@ export default function BrowseIssues() {
   const [labelFilters, setLabelFilters] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState("all");
 
-  const { data: issues = [], isLoading } = useQuery({
+  // Demo data for issues
+  const sampleIssues = [
+    {
+      id: 1,
+      title: "Fix documentation for React",
+      description: "The installation guide has several outdated steps that need to be updated for the latest version.",
+      repository: "facebook/react",
+      url: "https://github.com/facebook/react/issues/1",
+      reward: 100,
+      type: "docs",
+      labels: ["documentation", "good first issue"],
+      createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+      updatedAt: new Date()
+    },
+    {
+      id: 2,
+      title: "Add dark mode to the React UI",
+      description: "The app should respect the user's system theme preference and offer a toggle for light/dark mode.",
+      repository: "facebook/react",
+      url: "https://github.com/facebook/react/issues/2",
+      reward: 250,
+      type: "enhancement",
+      labels: ["feature", "ui"],
+      createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+      updatedAt: new Date()
+    },
+    {
+      id: 3,
+      title: "Fix memory leak in Go-Ethereum",
+      description: "There's a serious memory leak when processing large data sets that needs to be addressed.",
+      repository: "ethereum/go-ethereum",
+      url: "https://github.com/ethereum/go-ethereum/issues/3",
+      reward: 500,
+      type: "bug",
+      labels: ["bug", "critical"],
+      createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+      updatedAt: new Date()
+    },
+    {
+      id: 4,
+      title: "Implement CI/CD pipeline for Base contracts",
+      description: "Need to set up automated testing and deployment workflows using GitHub Actions.",
+      repository: "base-org/contracts",
+      url: "https://github.com/base-org/contracts/issues/5",
+      reward: 300,
+      type: "enhancement",
+      labels: ["devops", "automation"],
+      createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+      updatedAt: new Date()
+    },
+    {
+      id: 5,
+      title: "Fix TypeError in CodeCrew App",
+      description: "There's a type error occurring in the payments module that needs to be fixed.",
+      repository: "UJWALGUPTA/code-crew-app",
+      url: "https://github.com/UJWALGUPTA/code-crew-app/issues/3",
+      reward: 500,
+      type: "bug",
+      labels: ["bug", "high-priority"],
+      createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+      updatedAt: new Date()
+    }
+  ];
+
+  // Use sample issues for the demo
+  const { data: issues = sampleIssues, isLoading = false } = useQuery({
     queryKey: ["/api/issues"],
-    enabled: isAuthenticated,
+    enabled: false, // Disable actual API request for demo
   });
 
-  const { data: popularLabels = [] } = useQuery({
+  // Sample popular labels for demo
+  const sampleLabels = [
+    { name: "bug", count: 48 },
+    { name: "feature", count: 37 },
+    { name: "enhancement", count: 26 },
+    { name: "documentation", count: 19 },
+    { name: "good first issue", count: 14 }
+  ];
+
+  const { data: popularLabels = sampleLabels } = useQuery({
     queryKey: ["/api/labels/popular"],
-    enabled: isAuthenticated,
+    enabled: false, // Disable actual API request for demo
   });
 
   const filteredIssues = issues.filter((issue: any) => {

@@ -22,9 +22,73 @@ export default function History() {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("all");
 
-  const { data: history = [], isLoading } = useQuery({
+  // Sample history data for the demo
+  const sampleHistory = [
+    {
+      id: 1,
+      type: "claim",
+      status: "completed",
+      date: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000),
+      issue: {
+        id: 3,
+        title: "Fix memory leak in Go-Ethereum",
+        url: "https://github.com/ethereum/go-ethereum/issues/3"
+      },
+      repository: "ethereum/go-ethereum",
+      reward: 500,
+      transactionHash: "0x" + Math.random().toString(16).substr(2, 64)
+    },
+    {
+      id: 2,
+      type: "claim",
+      status: "completed",
+      date: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000),
+      issue: {
+        id: 5,
+        title: "Add TypeScript definitions",
+        url: "https://github.com/base-org/contracts/issues/4"
+      },
+      repository: "base-org/contracts",
+      reward: 200,
+      transactionHash: "0x" + Math.random().toString(16).substr(2, 64)
+    },
+    {
+      id: 3,
+      type: "claim",
+      status: "rejected",
+      date: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000),
+      issue: {
+        id: 7,
+        title: "Optimize database queries",
+        url: "https://github.com/facebook/react/issues/7"
+      },
+      repository: "facebook/react",
+      reward: 300,
+      reason: "Pull request didn't address the core performance issues"
+    },
+    {
+      id: 4,
+      type: "deposit",
+      status: "completed",
+      date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+      repository: "UJWALGUPTA/code-crew-app",
+      amount: 1000,
+      transactionHash: "0x" + Math.random().toString(16).substr(2, 64)
+    },
+    {
+      id: 5,
+      type: "withdrawal",
+      status: "completed",
+      date: new Date(Date.now() - 35 * 24 * 60 * 60 * 1000),
+      amount: 200,
+      transactionHash: "0x" + Math.random().toString(16).substr(2, 64)
+    }
+  ];
+
+  // Use sample history for the demo
+  const { data: history = sampleHistory, isLoading = false } = useQuery({
     queryKey: ["/api/history"],
-    enabled: isAuthenticated,
+    enabled: false, // Disable actual API request for demo
   });
 
   const filteredHistory = history.filter((item: any) => {
