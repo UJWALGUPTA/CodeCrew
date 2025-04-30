@@ -40,7 +40,9 @@ export const GithubProvider = ({ children }: { children: ReactNode }) => {
       setIsConnected(true);
       
       // Load repositories when connected
-      fetchUserRepositories();
+      fetchUserRepositories().catch(err => {
+        console.error("Failed to fetch repositories on init:", err);
+      });
     } else {
       setIsConnected(false);
       setUsername("");

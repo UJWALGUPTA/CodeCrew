@@ -59,6 +59,7 @@ export default function AddRepository() {
     queryKey: ["/api/github/repositories"],
     enabled: isGithubConnected,
     staleTime: 1000 * 60 * 5, // 5 minutes
+    retry: 3
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -116,7 +117,17 @@ export default function AddRepository() {
   });
 
   const handleSelectRepository = (repo: Repository) => {
-    form.setValue("repositoryUrl", repo.url);
+    form.setValue("repositoryUrl", repo.url, { 
+      shouldValidate: true,
+      shouldDirty: true,
+      shouldTouch: true
+    });
+    
+    // Show a small confirmation toast
+    toast({
+      title: "Repository selected",
+      description: `Selected ${repo.fullName}`,
+    });
   };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
