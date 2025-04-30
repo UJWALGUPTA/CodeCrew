@@ -12,16 +12,41 @@ import AddRepository from "@/pages/add-repository";
 import Login from "@/pages/login";
 import { AuthProvider } from "@/hooks/use-auth";
 import { GithubProvider } from "@/hooks/use-github";
+import { ProtectedRoute } from "@/components/protected-route";
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/browse-issues" component={BrowseIssues} />
-      <Route path="/my-claims" component={MyClaims} />
-      <Route path="/history" component={History} />
-      <Route path="/repository/:id" component={RepositoryDetail} />
-      <Route path="/add-repository" component={AddRepository} />
+      <Route path="/">
+        <ProtectedRoute>
+          <Home />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/browse-issues">
+        <ProtectedRoute>
+          <BrowseIssues />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/my-claims">
+        <ProtectedRoute>
+          <MyClaims />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/history">
+        <ProtectedRoute>
+          <History />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/repository/:id">
+        <ProtectedRoute>
+          <RepositoryDetail />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/add-repository">
+        <ProtectedRoute>
+          <AddRepository />
+        </ProtectedRoute>
+      </Route>
       <Route path="/login" component={Login} />
       <Route component={NotFound} />
     </Switch>
