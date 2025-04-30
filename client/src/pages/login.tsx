@@ -12,7 +12,7 @@ export default function Login() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      setLocation("/");
+      setLocation("/dashboard");
     }
   }, [isAuthenticated, setLocation]);
 

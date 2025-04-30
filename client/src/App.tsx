@@ -10,6 +10,7 @@ import History from "@/pages/history";
 import RepositoryDetail from "@/pages/repository-detail";
 import AddRepository from "@/pages/add-repository";
 import Login from "@/pages/login";
+import Landing from "@/pages/landing";
 import { AuthProvider } from "@/hooks/use-auth";
 import { GithubProvider } from "@/hooks/use-github";
 import { ProtectedRoute } from "@/components/protected-route";
@@ -17,34 +18,47 @@ import { ProtectedRoute } from "@/components/protected-route";
 function Router() {
   return (
     <Switch>
-      <Route path="/">
+      <Route path="/" component={Landing} />
+      <Route path="/dashboard">
         <ProtectedRoute>
-          <Home />
+          <Layout>
+            <Home />
+          </Layout>
         </ProtectedRoute>
       </Route>
       <Route path="/browse-issues">
         <ProtectedRoute>
-          <BrowseIssues />
+          <Layout>
+            <BrowseIssues />
+          </Layout>
         </ProtectedRoute>
       </Route>
       <Route path="/my-claims">
         <ProtectedRoute>
-          <MyClaims />
+          <Layout>
+            <MyClaims />
+          </Layout>
         </ProtectedRoute>
       </Route>
       <Route path="/history">
         <ProtectedRoute>
-          <History />
+          <Layout>
+            <History />
+          </Layout>
         </ProtectedRoute>
       </Route>
       <Route path="/repository/:id">
         <ProtectedRoute>
-          <RepositoryDetail />
+          <Layout>
+            <RepositoryDetail />
+          </Layout>
         </ProtectedRoute>
       </Route>
       <Route path="/add-repository">
         <ProtectedRoute>
-          <AddRepository />
+          <Layout>
+            <AddRepository />
+          </Layout>
         </ProtectedRoute>
       </Route>
       <Route path="/login" component={Login} />
@@ -58,9 +72,7 @@ function App() {
     <TooltipProvider>
       <AuthProvider>
         <GithubProvider>
-          <Layout>
-            <Router />
-          </Layout>
+          <Router />
           <Toaster />
         </GithubProvider>
       </AuthProvider>

@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom styles for landing page */
+.bg-grid-pattern-overlay {
+  background-image: 
+    linear-gradient(rgba(13, 17, 23, 0.8) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(13, 17, 23, 0.8) 1px, transparent 1px);
+  background-size: 40px 40px;
+  background-position: center center;
+}
+
 @layer base {
   :root {
     /* CodeCrew color schema */
