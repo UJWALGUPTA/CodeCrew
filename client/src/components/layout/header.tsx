@@ -5,7 +5,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { Badge } from "@/components/ui/badge";
 import { Bell, LogOut, Settings, User } from "lucide-react";
 import GithubConnectButton from "@/components/github/github-connect-button";
-import { WalletConnectButton } from "@/components/wallet/wallet-connect-button";
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useLocation } from "wouter";
 
 export default function Header() {
@@ -61,7 +61,7 @@ export default function Header() {
           </DropdownMenu>
           
           <GithubConnectButton />
-          <WalletConnectButton />
+          <ConnectButton showBalance={{smallScreen: false, largeScreen: true}} />
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

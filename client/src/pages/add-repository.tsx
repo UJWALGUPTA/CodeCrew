@@ -56,7 +56,7 @@ export default function AddRepository() {
   const [selectedRepository, setSelectedRepository] = useState<Repository | null>(null);
 
   // Fetch GitHub repositories
-  const { data: githubRepos = [], isLoading: isLoadingRepos, refetch: refetchRepos } = useQuery<Repository[]>({
+  const { data: githubRepos = [], isLoading: isLoadingRepos, refetch: refetchRepos, error: reposError } = useQuery<Repository[]>({
     queryKey: ["/api/github/repositories"],
     enabled: isGithubConnected,
     staleTime: 1000 * 60 * 5, // 5 minutes
@@ -257,6 +257,15 @@ export default function AddRepository() {
                 </div>
               </div>
               
+              {/* Debug info */}
+              <div className="text-xs text-muted-foreground mb-4">
+                <div>isConnected: {isConnected.toString()}</div>
+                <div>isGithubConnected: {isGithubConnected.toString()}</div>
+                <div>isLoadingRepos: {isLoadingRepos.toString()}</div>
+                <div>Repos count: {githubRepos ? githubRepos.length : 0}</div>
+                {reposError && <div className="text-destructive">Error: {String(reposError)}</div>}
+              </div>
+
               {isLoadingRepos ? (
                 <div className="space-y-3">
                   <Skeleton className="h-20 w-full" />

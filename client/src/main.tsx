@@ -5,7 +5,7 @@ import { RainbowKitProvider, darkTheme } from "@rainbow-me/rainbowkit";
 import "@rainbow-me/rainbowkit/styles.css";
 import { WagmiConfig } from "wagmi";
 import { http, createConfig } from "wagmi";
-import { base, baseGoerli } from "viem/chains";
+import { base, baseSepolia } from "viem/chains";
 import { getDefaultConfig } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
@@ -37,10 +37,10 @@ if (!walletConnectProjectId) {
 const config = getDefaultConfig({
   appName: "CodeCrew",
   projectId: walletConnectProjectId,
-  chains: [base, baseGoerli],
+  chains: [base, baseSepolia],
   transports: {
     [base.id]: http(),
-    [baseGoerli.id]: http(),
+    [baseSepolia.id]: http(),
   },
 });
 
