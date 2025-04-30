@@ -1,36 +1,33 @@
-import { ReactNode, useEffect } from 'react';
-import { useLocation } from 'wouter';
-import { useAuth } from '@/hooks/use-auth';
-import { Spinner } from '@/components/ui/spinner';
+import React, { ReactNode, useEffect } from "react";
+import { useLocation } from "wouter";
+import { useAuth } from "@/hooks/use-auth";
+import { SpinnerFullPage } from "@/components/ui/spinner";
 
-type ProtectedRouteProps = {
+interface ProtectedRouteProps {
   children: ReactNode;
-};
+  redirectTo?: string;
+}
 
-export function ProtectedRoute({ children }: ProtectedRouteProps) {
+export function ProtectedRoute({ 
+  children, 
+  redirectTo = "/login" 
+}: ProtectedRouteProps) {
   const { isAuthenticated, isLoading } = useAuth();
-  const [, navigate] = useLocation();
-  
+  const [, setLocation] = useLocation();
+
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      navigate('/login');
+      setLocation(redirectTo);
     }
-  }, [isAuthenticated, isLoading, navigate]);
+  }, [isAuthenticated, isLoading, redirectTo, setLocation]);
 
-  // If still loading, show loading spinner
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-[70vh]">
-        <Spinner className="w-8 h-8" />
-      </div>
-    );
+    return <SpinnerFullPage />;
   }
 
-  // If authenticated, render children
-  if (isAuthenticated) {
-    return <>{children}</>;
+  if (!isAuthenticated) {
+    return null; // Will redirect via useEffect
   }
 
-  // Default - render nothing while redirecting
-  return null;
+  return <>{children}</>;
 }
