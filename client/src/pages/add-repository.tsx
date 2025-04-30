@@ -4,6 +4,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useLocation } from "wouter";
+import { useAccount, useConnect } from "wagmi";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -48,7 +50,9 @@ export default function AddRepository() {
   const [location, navigate] = useLocation();
   const { toast } = useToast();
   const { isAuthenticated } = useAuth();
-  const { isConnected, connect } = useWallet();
+  const { isConnected: isWalletConnected, connect } = useWallet();
+  // Use RainbowKit's connection status instead of our custom hook
+  const { isConnected } = useAccount();
   const { isConnected: isGithubConnected, connect: connectGithub, fetchUserRepositories } = useGithub();
   const queryClient = useQueryClient();
   const [isAdding, setIsAdding] = useState(false);
@@ -60,18 +64,26 @@ export default function AddRepository() {
     queryKey: ["/api/github/sample-repositories"], // Using our public sample repos endpoint
     queryFn: async () => {
       console.log("Fetching repositories from sample endpoint");
-      const response = await fetch("/api/github/sample-repositories", {
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json"
+      try {
+        const response = await fetch("/api/github/sample-repositories", {
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+        
+        if (!response.ok) {
+          console.error(`API Error: ${response.status} ${response.statusText}`);
+          throw new Error(`API Error: ${response.status} ${response.statusText}`);
         }
-      });
-      if (!response.ok) {
-        throw new Error(`API Error: ${response.status} ${response.statusText}`);
+        
+        const data = await response.json();
+        console.log(`Received ${data.length} repositories from API:`, data);
+        return data;
+      } catch (error) {
+        console.error("Error fetching repositories:", error);
+        throw error;
       }
-      const data = await response.json();
-      console.log(`Received ${data.length} repositories from API`);
-      return data;
     },
     enabled: true, // Always fetch sample repos
     staleTime: 1000 * 60 * 5, // 5 minutes
@@ -230,16 +242,11 @@ export default function AddRepository() {
             <Alert className="mb-6" variant="destructive">
               <AlertCircle className="h-4 w-4" />
               <AlertTitle>Wallet Required</AlertTitle>
-              <AlertDescription>
+              <AlertDescription className="flex items-center">
                 You need to connect your wallet to fund the repository.
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="ml-2"
-                  onClick={connect}
-                >
-                  Connect Wallet
-                </Button>
+                <div className="ml-2">
+                  <ConnectButton />
+                </div>
               </AlertDescription>
             </Alert>
           )}
