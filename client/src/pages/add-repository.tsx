@@ -124,14 +124,29 @@ export default function AddRepository() {
       console.log("Repository created:", repository);
       
       // Check if we have a valid repository ID before trying to fund it
-      if (!repository || !repository.id) {
-        throw new Error("Repository was created but no ID was returned");
+      if (repository && repository.id) {
+        // Only attempt to fund if we have a valid repository ID
+        try {
+          // Then fund it
+          await apiRequest("POST", `/api/repositories/${repository.id}/fund`, {
+            amount: Number(values.initialFunding),
+          });
+          console.log("Repository funded successfully");
+        } catch (fundingError) {
+          console.error("Error funding repository:", fundingError);
+          toast({
+            title: "Repository added, but funding failed",
+            description: "The repository was added, but there was an error funding it. You can try funding it later.",
+            variant: "destructive",
+          });
+        }
+      } else {
+        console.warn("Repository object doesn't have ID, skipping funding step", repository);
+        toast({
+          title: "Repository added",
+          description: "The repository was added without initial funding. You can fund it later.",
+        });
       }
-      
-      // Then fund it
-      await apiRequest("POST", `/api/repositories/${repository.id}/fund`, {
-        amount: Number(values.initialFunding),
-      });
       
       return repository;
     },
@@ -240,6 +255,25 @@ export default function AddRepository() {
                 >
                   <Github className="mr-2 h-4 w-4" />
                   Connect GitHub
+                </Button>
+              </AlertDescription>
+            </Alert>
+          )}
+          
+          {isGithubConnected && (
+            <Alert className="mb-6">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Install GitHub App</AlertTitle>
+              <AlertDescription className="flex items-center">
+                Install the CodeCrew GitHub App to enable repository management and bounty tracking.
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="ml-2"
+                  onClick={() => window.open("https://github.com/apps/codecrewai", "_blank")}
+                >
+                  <Github className="mr-2 h-4 w-4" />
+                  Install GitHub App
                 </Button>
               </AlertDescription>
             </Alert>
