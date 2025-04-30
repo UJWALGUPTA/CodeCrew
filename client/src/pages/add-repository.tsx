@@ -18,7 +18,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useGithub } from "@/hooks/use-github";
 import { useWallet } from "@/hooks/use-wallet";
 import { apiRequest } from "@/lib/queryClient";
-import { AlertCircle, Github, Plus, ExternalLink, RefreshCw, Star, GitFork } from "lucide-react";
+import { AlertCircle, Github, Plus, ExternalLink, RefreshCw, Star, GitFork, CheckCircle, XCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 import { Badge } from "@/components/ui/badge";
@@ -58,7 +58,56 @@ export default function AddRepository() {
   const [isAdding, setIsAdding] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRepository, setSelectedRepository] = useState<Repository | null>(null);
+  const [isCheckingAppInstall, setIsCheckingAppInstall] = useState(false);
+  const [isAppInstalled, setIsAppInstalled] = useState(false);
+  const [appInstallUrl, setAppInstallUrl] = useState("");
 
+  // Fetch GitHub App details 
+  const { data: githubAppDetails } = useQuery({
+    queryKey: ["/api/github/app-details"],
+    queryFn: async () => {
+      const response = await fetch("/api/github/app-details");
+      if (!response.ok) {
+        throw new Error("Failed to fetch GitHub App details");
+      }
+      return response.json();
+    },
+    staleTime: 1000 * 60 * 60, // 1 hour
+    refetchOnWindowFocus: false
+  });
+  
+  // Function to check if GitHub App is installed on a repository
+  const checkAppInstallation = async (owner: string, repo: string) => {
+    setIsCheckingAppInstall(true);
+    setIsAppInstalled(false);
+    
+    try {
+      const response = await fetch(`/api/github/check-app-installed/${owner}/${repo}`, {
+        credentials: "include"
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to check GitHub App installation");
+      }
+      
+      const data = await response.json();
+      setIsAppInstalled(data.installed);
+      setAppInstallUrl(data.installUrl);
+      
+      return data.installed;
+    } catch (error) {
+      console.error("Error checking GitHub App installation:", error);
+      toast({
+        title: "Error",
+        description: "Failed to check if GitHub App is installed on the repository",
+        variant: "destructive"
+      });
+      return false;
+    } finally {
+      setIsCheckingAppInstall(false);
+    }
+  };
+  
   // Fetch GitHub repositories
   const { data: githubRepos = [], isLoading: isLoadingRepos, refetch: refetchRepos, error: reposError } = useQuery<Repository[]>({
     queryKey: ["/api/github/repositories"], // Use authenticated repository endpoint
