@@ -107,7 +107,21 @@ export const GithubProvider = ({ children }: { children: ReactNode }) => {
     if (!isConnected) return [];
     
     try {
-      const repos = await apiRequest("GET", "/api/github/repositories", undefined);
+      console.log("Fetching GitHub repositories...");
+      const response = await fetch("/api/github/repositories", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include"
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch repositories: ${response.status} ${response.statusText}`);
+      }
+      
+      const repos = await response.json();
+      console.log("Fetched repositories:", repos);
       setRepositories(repos);
       return repos;
     } catch (error) {

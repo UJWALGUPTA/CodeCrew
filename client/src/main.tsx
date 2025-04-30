@@ -18,12 +18,15 @@ const queryClient = new QueryClient({
   },
 });
 
-// Configure chains & providers for Rainbow Kit
-const walletConnectProjectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || '';
+// Configure chains & providers for Rainbow Kit - use hardcoded project ID for simplicity
+// In a real-world scenario, this would come from environment variables
+const walletConnectProjectId = '1f2ec2e9691e3f73a1b797dd8d693ad4';
 
 // Check if project ID is available
 if (!walletConnectProjectId) {
   console.warn('WalletConnect Project ID is missing! Wallet connections may not work properly.');
+} else {
+  console.log('WalletConnect Project ID is configured successfully:', walletConnectProjectId);
 }
 
 const config = getDefaultConfig({

@@ -117,17 +117,29 @@ export default function AddRepository() {
   });
 
   const handleSelectRepository = (repo: Repository) => {
+    // Update form values
     form.setValue("repositoryUrl", repo.url, { 
       shouldValidate: true,
       shouldDirty: true,
       shouldTouch: true
     });
     
+    // Store selected repository details in state
+    setSelectedRepository(repo);
+    
     // Show a small confirmation toast
     toast({
       title: "Repository selected",
       description: `Selected ${repo.fullName}`,
     });
+    
+    // Scroll to form section
+    setTimeout(() => {
+      const formSection = document.getElementById('repository-form');
+      if (formSection) {
+        formSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100);
   };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
