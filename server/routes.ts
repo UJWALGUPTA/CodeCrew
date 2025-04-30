@@ -126,9 +126,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log("User authenticated:", user.username);
 
-      // Always use the sample repositories in development mode
-      // In production, this would use the GitHub token to fetch real repositories
-      const repositories = await githubClient.getSampleRepositories();
+      // Use the actual GitHub API to fetch real repositories
+      const repositories = await githubClient.getUserRepositories(user.accessToken || "");
       
       // Return only the necessary data to the client
       const formattedRepos = repositories.map((repo: any) => ({
@@ -264,7 +263,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/repositories/:id/fund", isAuthenticated, async (req: Request, res: Response) => {
     try {
+      console.log("Funding repository with ID:", req.params.id);
+      if (!req.params.id || isNaN(parseInt(req.params.id))) {
+        return res.status(400).json({ 
+          message: "Invalid repository ID",
+          providedId: req.params.id
+        });
+      }
+      
       const repoId = parseInt(req.params.id);
+      
+      if (isNaN(repoId)) {
+        return res.status(400).json({ message: "Invalid repository ID format" });
+      }
+      
+      console.log("Parsed repository ID:", repoId);
+      console.log("Amount to fund:", req.body.amount);
+      
       const amount = parseInt(req.body.amount);
       
       if (isNaN(amount) || amount <= 0) {
