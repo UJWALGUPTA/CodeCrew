@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 
-// This is a mock Web3 client for the ROXONN project
+// This is a mock Web3 client for the CodeCrew project
 // In a real implementation, this would connect to Base Chain
 class Web3Client {
   private rpcUrl: string;

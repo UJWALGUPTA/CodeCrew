@@ -2,7 +2,7 @@ import { storage } from "./storage";
 import * as crypto from 'crypto';
 import * as jwt from 'jsonwebtoken';
 
-// GitHub client for the ROXONN project - enhanced with GitHub App support
+// GitHub client for the CodeCrew project - enhanced with GitHub App support
 class GitHubClient {
   private appId: string;
   private privateKey: string;
