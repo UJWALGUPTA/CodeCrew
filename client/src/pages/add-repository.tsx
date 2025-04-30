@@ -57,8 +57,23 @@ export default function AddRepository() {
 
   // Fetch GitHub repositories
   const { data: githubRepos = [], isLoading: isLoadingRepos, refetch: refetchRepos, error: reposError } = useQuery<Repository[]>({
-    queryKey: ["/api/github/repositories"],
-    enabled: isGithubConnected,
+    queryKey: ["/api/github/sample-repositories"], // Using our public sample repos endpoint
+    queryFn: async () => {
+      console.log("Fetching repositories from sample endpoint");
+      const response = await fetch("/api/github/sample-repositories", {
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status} ${response.statusText}`);
+      }
+      const data = await response.json();
+      console.log(`Received ${data.length} repositories from API`);
+      return data;
+    },
+    enabled: true, // Always fetch sample repos
     staleTime: 1000 * 60 * 5, // 5 minutes
     retry: 3,
     refetchOnWindowFocus: false
@@ -237,7 +252,7 @@ export default function AddRepository() {
                   variant="outline" 
                   size="sm" 
                   onClick={() => refetchRepos()}
-                  disabled={isLoadingRepos || !isGithubConnected}
+                  disabled={isLoadingRepos}
                 >
                   <RefreshCw className={`h-4 w-4 mr-2 ${isLoadingRepos ? 'animate-spin' : ''}`} />
                   Refresh
@@ -307,16 +322,14 @@ export default function AddRepository() {
               ) : (
                 <div className="text-center py-8 border rounded-md">
                   <div className="text-muted-foreground mb-2">No repositories found</div>
-                  {isGithubConnected && (
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={() => refetchRepos()}
-                    >
-                      <RefreshCw className="h-4 w-4 mr-2" />
-                      Refresh
-                    </Button>
-                  )}
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => refetchRepos()}
+                  >
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Refresh
+                  </Button>
                 </div>
               )}
             </div>

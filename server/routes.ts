@@ -84,13 +84,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // -------------------- GitHub Routes --------------------
 
+  // Add a test endpoint to check if we can access the GitHub sample repositories
+  app.get("/api/github/sample-repositories", async (req: Request, res: Response) => {
+    try {
+      console.log("Fetching sample repositories for development");
+      const repositories = await githubClient.getSampleRepositories();
+      
+      const formattedRepos = repositories.map((repo: any) => ({
+        id: repo.id,
+        name: repo.name,
+        fullName: repo.full_name,
+        description: repo.description,
+        url: repo.html_url,
+        isPrivate: repo.private,
+        stars: repo.stargazers_count,
+        forks: repo.forks_count,
+        openIssues: repo.open_issues_count,
+        owner: repo.owner.login
+      }));
+      
+      console.log(`Returning ${formattedRepos.length} sample repositories to client (public endpoint)`);
+      res.json(formattedRepos);
+    } catch (error) {
+      console.error("Error fetching sample repositories:", error);
+      res.status(500).json({ message: "Failed to fetch sample repositories" });
+    }
+  });
+
   app.get("/api/github/repositories", isAuthenticated, async (req: Request, res: Response) => {
     try {
+      // Log authentication information
+      console.log("GitHub repositories endpoint accessed");
+      console.log("Session userId:", req.session.userId);
+      
       // Get the authenticated user
       const user = await storage.getUser(req.session.userId!);
       if (!user) {
+        console.log("User not found for ID:", req.session.userId);
         return res.status(401).json({ message: "User not found" });
       }
+
+      console.log("User authenticated:", user.username);
 
       // Always use the sample repositories in development mode
       // In production, this would use the GitHub token to fetch real repositories
