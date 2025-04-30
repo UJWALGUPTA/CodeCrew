@@ -19,9 +19,16 @@ const queryClient = new QueryClient({
 });
 
 // Configure chains & providers for Rainbow Kit
+const walletConnectProjectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || '';
+
+// Check if project ID is available
+if (!walletConnectProjectId) {
+  console.warn('WalletConnect Project ID is missing! Wallet connections may not work properly.');
+}
+
 const config = getDefaultConfig({
   appName: 'CodeCrew',
-  projectId: 'bounty-platform',
+  projectId: walletConnectProjectId,
   chains: [base, baseGoerli],
   transports: {
     [base.id]: http(),
