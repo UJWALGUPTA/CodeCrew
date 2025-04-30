@@ -55,8 +55,8 @@ export function useContracts() {
   // For simulated token data (since we're not making actual blockchain calls in this demo)
   const simulatedTokenInfo: TokenInfo = {
     balance: '1000.00',
-    symbol: 'ROXN',
-    name: 'Roxonn Token'
+    symbol: 'CREW',
+    name: 'CodeCrew Token'
   };
 
   // Get token information
@@ -153,7 +153,7 @@ export function useContracts() {
       setTimeout(() => {
         toast({
           title: "Success",
-          description: `Successfully funded repository with ${amount} ROXN.`,
+          description: `Successfully funded repository with ${amount} CREW.`,
         });
         setIsLoading(false);
       }, 1200);

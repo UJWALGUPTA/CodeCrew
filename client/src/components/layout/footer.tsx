@@ -3,7 +3,7 @@ export default function Footer() {
     <footer className="bg-card border-t border-border py-4 px-6 mt-auto">
       <div className="container mx-auto flex flex-col md:flex-row justify-between items-center text-sm text-muted-foreground">
         <div className="flex items-center mb-2 md:mb-0">
-          <span className="neon-primary">ROXONN</span>
+          <span className="text-primary font-medium">CodeCrew</span>
           <span className="mx-2">•</span>
           <span>Decentralized GitHub Rewards Platform</span>
         </div>
