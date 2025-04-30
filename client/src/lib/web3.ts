@@ -15,10 +15,10 @@ const BountyContractABI = [
   "function getBounty(bytes32 issueId) external view returns (bytes32, bytes32, address, uint256, uint8, address, uint256, uint256)"
 ];
 
-// Token contract addresses on Base Chain (mock values for development)
-export const REWARD_TOKEN_ADDRESS = import.meta.env.VITE_REWARD_TOKEN_ADDRESS || "0x4200000000000000000000000000000000000006"; // Example: using wrapped ETH on Base
-export const REWARD_POOL_MANAGER_ADDRESS = import.meta.env.VITE_REWARD_POOL_MANAGER_ADDRESS || "0x0000000000000000000000000000000000000001";
-export const BOUNTY_CONTRACT_ADDRESS = import.meta.env.VITE_BOUNTY_CONTRACT_ADDRESS || "0x0000000000000000000000000000000000000002";
+// Token contract addresses on Base Chain - using deployed contract addresses
+export const REWARD_TOKEN_ADDRESS = import.meta.env.VITE_REWARD_TOKEN_ADDRESS || "0x0D442Bc93efC14161aDc0DB3783d9ec98F9e1416"; // RoxonnToken
+export const REWARD_POOL_MANAGER_ADDRESS = import.meta.env.VITE_REWARD_POOL_MANAGER_ADDRESS || "0xa00EF3C52Fbfcbc4226b3520B1eDf56D880f9C69"; // RewardPoolManager
+export const BOUNTY_CONTRACT_ADDRESS = import.meta.env.VITE_BOUNTY_CONTRACT_ADDRESS || "0x6D0C54455a9880cE569814F2Bc2BE3a4F4a12CC7"; // BountyContract
 
 // Base Chain RPC URL and Chain ID
 export const BASE_RPC_URL = import.meta.env.VITE_BASE_RPC_URL || "https://sepolia.base.org";

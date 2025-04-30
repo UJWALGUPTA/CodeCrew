@@ -1,34 +1,15 @@
-import React from "react";
-import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 
-interface SpinnerProps {
-  size?: "sm" | "md" | "lg";
-  className?: string;
-}
-
-const sizeClasses = {
-  sm: "h-4 w-4",
-  md: "h-6 w-6",
-  lg: "h-8 w-8",
-};
-
-export function Spinner({ size = "md", className }: SpinnerProps) {
+export function Spinner({ className }: { className?: string }) {
   return (
-    <Loader2 
-      className={cn(
-        "animate-spin text-primary",
-        sizeClasses[size],
-        className
-      )}
-    />
+    <Loader2 className={`animate-spin ${className || 'h-5 w-5'}`} />
   );
 }
 
 export function SpinnerFullPage() {
   return (
-    <div className="flex items-center justify-center h-screen w-full">
-      <Spinner size="lg" />
+    <div className="fixed inset-0 bg-background/80 flex items-center justify-center z-50">
+      <Spinner className="h-8 w-8 text-primary" />
     </div>
   );
 }
