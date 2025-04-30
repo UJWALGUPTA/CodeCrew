@@ -1,0 +1,195 @@
+CodeCrew Landing Page – Updated Wireframe (Dark Mode)
+🔝 1. Navigation Bar (Sticky)
+Left: CodeCrew Logo (text+icon, white)
+
+Center: Home | Browse Projects | Insights | About | Contact
+
+Right: Toggle Theme Icon (🌙/☀️) | Launch App (highlighted CTA)
+
+💡 Inspiration: GitHub's minimal navbar with Hugging Face’s Launch App CTA
+Sticky on scroll | Hamburger menu on mobile | Dark #0D1117 bg
+
+🎯 2. Hero Section
+Headline: Earn Crypto for Contributing to Open Source
+
+Subtext: Fix bugs, add features, review code — get rewarded when your work is accepted
+
+Buttons:
+
+🔵 Launch App (Primary CTA)
+
+⚪ Join Community
+
+Visual: Animated background (flowing code lines + floating tokens)
+
+Trust Bar (Below CTA):
+
+Logos: GitHub, AWS, Microsoft for Startups, Zoho, T-Hub
+
+Layout: Center-aligned text + buttons, dark gradient overlay
+Animation: Subtle motion behind text | Cards fade on scroll
+
+⚙️ 3. How CodeCrew Works
+📌 Dual Paths (Side-by-Side on Desktop, Stacked on Mobile)
+For Contributors:
+
+Connect GitHub + Wallet
+
+Pick an Issue with Bounty
+
+Submit PR
+
+Get Paid in Crypto
+
+For Pool Managers:
+
+Install GitHub App
+
+Fund Issues
+
+Approve PRs
+
+Release Rewards
+
+Each step = Icon + Title + 1-line desc
+Animated arrows or sliding transitions on scroll
+
+🧠 4. Ways to Contribute (Modular Grid – 2x3)
+Each card includes:
+
+Icon (e.g. bug, spark, book)
+
+Title: Fix Bugs | Add Features | Write Docs | Test Software | Review Code | Help Others
+
+Short 1-liner
+
+CTA: Explore Bounties →
+
+Layout: Grid (2x3 desktop), Swipeable cards on mobile
+Hover effect: card elevation, icon motion
+
+🔥 5. Featured Projects
+Filter Tabs: All | Web3 | AI | DevTools | Infra
+
+Grid (3-column on desktop):
+
+Project Card:
+
+Repo Name
+
+Tags
+
+Open Issues: X
+
+Total Pool: Ξ 3.2 or 500 USDC
+
+CTA: View Project
+
+CTA below: Browse All Projects
+
+Cards have subtle border, hover lift, tag badges
+Mobile: swipe horizontally across categories
+
+💰 6. Top Contributors & Testimonials
+Left: Contributor Showcase:
+
+Avatar, GitHub handle, X ROXN earned
+
+Right: Testimonials Carousel:
+
+Quote: "I fixed a bug and earned $150!"
+
+Attribution: GitHub name + avatar
+
+Arrows or dots for nav
+
+Carousel auto-plays | Mobile: stacked layout | Smooth fade-in
+
+🪙 7. ROXN Token Overview (Secondary Focus)
+3 Columns (icons + label + text):
+
+🎯 Rewards → Earn tokens for contributions
+
+🗳 Governance → Vote on proposals (coming soon)
+
+🔒 Staking → Lock tokens for bonus rewards
+
+Tag: Tokenomics Finalizing
+
+CTA: Learn More
+
+Lighter background section (still dark mode)
+Minimal text, uses icon cards
+
+📰 8. Latest Insights (Blog Preview)
+2–3 Article Cards:
+
+Title
+
+Tags (e.g., Blockchain, Updates)
+
+1–2 line excerpt
+
+Read More →
+
+Simple, minimal card UI
+Layout: 2 column desktop | stacked mobile
+
+🗳 9. Community Governance (Coming Soon)
+Headline: Vote on What Gets Built
+
+Text: Use your ROXN tokens to suggest features and vote on priorities
+
+Badges: Coming Soon
+
+CTA: Join Community
+
+Optional: Simple governance voting preview mockup (ballot list UI)
+Section is teaser only – limited interactivity
+
+📬 10. Newsletter Signup
+Headline: Stay Updated on Bounties & Launches
+
+Input: Email field you@example.com
+
+Button: Subscribe
+
+Hint: “No spam. Unsub anytime.”
+Centered | Full-width on mobile
+
+🔗 11. Footer
+4 Columns:
+
+Product: About, Roadmap, Insights
+
+Support: Docs, FAQs, Contact
+
+Community: GitHub, Twitter, Forum
+
+Legal: Terms, Privacy
+
+Copyright:
+
+© 2025 CodeCrew. All rights reserved.
+
+Subtle link hovers | Light-gray text on deep-black bg
+
+🔄 Responsive Behavior
+
+Desktop	Mobile View
+Nav center-aligned	Hamburger + sticky CTA
+2-column sections	Vertically stacked
+Grid cards	Swipeable horizontal rows
+Button sizes fixed	Full-width CTAs
+Animated fades/slides	Disabled on low bandwidth
+✅ Final Notes
+Dark-mode first (GitHub-like feel), white/gray text with blue/purple/yellow CTA accents
+
+Animations: Smooth but minimal (fade in, slide up, hover glows)
+
+Icons: Flat, outlined, developer-friendly (FontAwesome/Feather)
+
+Accessibility: Keyboard nav + high contrast
+
+Style Guide: Use Tailwind/Chakra or GitHub’s Primer CSS system
+

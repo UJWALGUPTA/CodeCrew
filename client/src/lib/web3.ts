@@ -21,8 +21,8 @@ export const REWARD_POOL_MANAGER_ADDRESS = import.meta.env.VITE_REWARD_POOL_MANA
 export const BOUNTY_CONTRACT_ADDRESS = import.meta.env.VITE_BOUNTY_CONTRACT_ADDRESS || "0x0000000000000000000000000000000000000002";
 
 // Base Chain RPC URL and Chain ID
-export const BASE_RPC_URL = import.meta.env.VITE_BASE_RPC_URL || "https://base-goerli.public.blastapi.io";
-export const BASE_CHAIN_ID = import.meta.env.VITE_BASE_CHAIN_ID ? parseInt(import.meta.env.VITE_BASE_CHAIN_ID) : 84531; // Base Goerli testnet
+export const BASE_RPC_URL = import.meta.env.VITE_BASE_RPC_URL || "https://sepolia.base.org";
+export const BASE_CHAIN_ID = import.meta.env.VITE_BASE_CHAIN_ID ? parseInt(import.meta.env.VITE_BASE_CHAIN_ID) : 84532; // Base Sepolia testnet
 
 // Interface to represent wallet providers (MetaMask, WalletConnect, etc.)
 export interface WalletProvider {
@@ -57,14 +57,14 @@ export async function addBaseChainToWallet(provider: any): Promise<boolean> {
       method: 'wallet_addEthereumChain',
       params: [{
         chainId: `0x${BASE_CHAIN_ID.toString(16)}`,
-        chainName: 'Base Goerli Testnet',
+        chainName: 'Base Sepolia Testnet',
         nativeCurrency: {
           name: 'ETH',
           symbol: 'ETH',
           decimals: 18
         },
         rpcUrls: [BASE_RPC_URL],
-        blockExplorerUrls: ['https://goerli.basescan.org']
+        blockExplorerUrls: ['https://sepolia-explorer.base.org']
       }]
     });
     return true;
