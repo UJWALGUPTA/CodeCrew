@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import { githubClient } from "./github";
 import { web3Client } from "./web3";
 import session from "express-session";
-import { startGithubOAuth, handleGithubCallback, logoutUser } from "./auth";
+import { startGithubOAuth, handleGithubCallback, logoutUser, getReplicationUrl } from "./auth";
 import * as crypto from "crypto";
 
 // Authentication middleware
@@ -162,16 +162,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // If user has GitHub access token, set up webhook
       if (user.accessToken) {
         try {
-          // Determine the webhook URL using Replit domains or host
-          let webhookUrl;
-          if (process.env.REPLIT_DEPLOYMENT_ID) {
-            // Use the first domain in the comma-separated REPLIT_DOMAINS env var
-            const domain = process.env.REPLIT_DOMAINS?.split(',')[0] || req.headers.host;
-            webhookUrl = `https://${domain}/api/github/webhook`;
-          } else {
-            // Local development
-            webhookUrl = `http://${req.headers.host}/api/github/webhook`;
-          }
+          // Use our reusable URL function to determine the webhook URL
+          const webhookUrl = getReplicationUrl(req, '/api/github/webhook');
           
           // Create webhook for the repository
           await githubClient.createWebhook(owner, name, user.accessToken, webhookUrl);
