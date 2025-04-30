@@ -722,8 +722,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     console.log(`Comment ${action} on issue #${issue.number} in ${repository.full_name}`);
     
-    // Check if this is a command comment (e.g. starting with !roxonn)
-    if (comment.body.startsWith('!roxonn')) {
+    // Check if this is a command comment (e.g. starting with !codecrew)
+    if (comment.body.startsWith('!codecrew')) {
       const parts = comment.body.split(' ');
       const command = parts[1]?.toLowerCase();
       
@@ -855,7 +855,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           repo.owner,
           repo.name,
           issue.number,
-          `@${username} has set a bounty of ${amount} ROXN tokens for this issue!`
+          `@${username} has set a bounty of ${amount} CREW tokens for this issue!`
         );
         
         // Add a label to the issue

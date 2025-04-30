@@ -9,7 +9,7 @@ import {
   REWARD_POOL_MANAGER_ADDRESS, 
   BOUNTY_CONTRACT_ADDRESS 
 } from '@/lib/contracts/artifacts/contract-addresses';
-import CodeCrewTokenABI from '@/lib/contracts/artifacts/RoxonnTokenABI.json';
+import CodeCrewTokenABI from '@/lib/contracts/artifacts/CodeCrewTokenABI.json';
 import RewardPoolManagerABI from '@/lib/contracts/artifacts/RewardPoolManagerABI.json';
 import BountyContractABI from '@/lib/contracts/artifacts/BountyContractABI.json';
 import { useToast } from '@/hooks/use-toast';
