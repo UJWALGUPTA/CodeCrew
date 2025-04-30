@@ -18,7 +18,7 @@ import { useWallet } from "@/hooks/use-wallet";
 import { apiRequest } from "@/lib/queryClient";
 import { AlertCircle, Github, Plus, ExternalLink, RefreshCw, Star, GitFork } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
