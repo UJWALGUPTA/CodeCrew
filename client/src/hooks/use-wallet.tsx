@@ -82,25 +82,28 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [isConnected, address]);
 
-  const handleConnection = async (walletAddress: string) => {
+  const handleConnection = async (walletAddress: string, checkChain = false) => {
     try {
       // Create Web3 provider
       const web3Provider = new ethers.BrowserProvider(window.ethereum);
       
-      try {
-        // Check if connected to Base chain
-        const isBaseChain = await checkBaseChainConfig(web3Provider);
-        if (!isBaseChain) {
-          const added = await addBaseChainToWallet(window.ethereum);
-          if (!added) {
-            // User may have rejected the chain switch, but we can still try to continue
-            console.warn("User declined to add Base Chain. App may not function correctly.");
-            // Don't throw error here, let users use the app even if not on Base
+      // Only check the chain configuration if specified (only during manual connect)
+      if (checkChain) {
+        try {
+          // Check if connected to Base chain
+          const isBaseChain = await checkBaseChainConfig(web3Provider);
+          if (!isBaseChain) {
+            const added = await addBaseChainToWallet(window.ethereum);
+            if (!added) {
+              // User may have rejected the chain switch, but we can still try to continue
+              console.warn("User declined to add Base Chain. App may not function correctly.");
+              // Don't throw error here, let users use the app even if not on Base
+            }
           }
+        } catch (chainError) {
+          // Don't block the user from connecting just because chain switching failed
+          console.warn("Chain configuration error:", chainError);
         }
-      } catch (chainError) {
-        // Don't block the user from connecting just because chain switching failed
-        console.warn("Chain configuration error:", chainError);
       }
       
       // Get the signer
@@ -137,7 +140,8 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     try {
       // Request account access
       const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-      await handleConnection(accounts[0]);
+      // Pass true to check chain config during manual connection
+      await handleConnection(accounts[0], true);
       
       toast({
         title: "Wallet Connected",
