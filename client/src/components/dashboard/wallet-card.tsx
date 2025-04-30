@@ -1,160 +1,112 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { useWallet } from "@/hooks/use-wallet";
-import { Tag, CircleDollarSign } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import WalletConnectButton from "@/components/wallet/wallet-connect-button";
+import { useEffect, useState } from 'react';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useContracts } from '@/hooks/use-contracts';
+import { useConnectModal } from '@rainbow-me/rainbowkit';
+import { useAccount } from 'wagmi';
+import { Loader2Icon, RefreshCwIcon } from 'lucide-react';
 
-export default function WalletCard() {
-  const { balance, address, isConnected } = useWallet();
-  const { toast } = useToast();
-  const [isFundRepoDialogOpen, setIsFundRepoDialogOpen] = useState(false);
-  const [isWithdrawDialogOpen, setIsWithdrawDialogOpen] = useState(false);
-  const [withdrawAmount, setWithdrawAmount] = useState("");
+export function WalletCard() {
+  const { address, isConnected } = useAccount();
+  const { openConnectModal } = useConnectModal();
+  const { isLoading, tokenInfo, getTokenInfo } = useContracts();
+  const [refreshing, setRefreshing] = useState(false);
 
-  const handleWithdraw = () => {
-    const amount = parseFloat(withdrawAmount);
-    if (isNaN(amount) || amount <= 0 || amount > balance) {
-      toast({
-        title: "Invalid amount",
-        description: "Please enter a valid amount to withdraw",
-        variant: "destructive",
-      });
-      return;
+  useEffect(() => {
+    if (isConnected && address) {
+      getTokenInfo();
     }
+  }, [address, isConnected, getTokenInfo]);
+
+  const handleRefresh = async () => {
+    if (!isConnected) return;
     
-    // This would connect to the actual blockchain in a real implementation
-    toast({
-      title: "Withdrawal simulated",
-      description: `${amount} TOKENS would be withdrawn to your wallet`,
-    });
-    
-    setIsWithdrawDialogOpen(false);
+    setRefreshing(true);
+    await getTokenInfo();
+    setRefreshing(false);
   };
 
-  // If wallet is not connected, show a connect button instead
-  if (!isConnected) {
-    return (
-      <Card className="overflow-hidden">
-        <CardContent className="p-5 flex flex-col items-center justify-center gap-4">
-          <h3 className="font-medium text-sm flex items-center">
-            <Tag className="w-4 h-4 mr-1.5 text-primary" />
-            Base Wallet
-          </h3>
-          <p className="text-center text-muted-foreground">Connect your wallet to fund repositories and claim bounties</p>
-          <WalletConnectButton />
-        </CardContent>
-      </Card>
-    );
-  }
+  const formatBalance = (balance: string) => {
+    // Format to 2 decimal places
+    return parseFloat(balance).toFixed(2);
+  };
+
+  const truncateAddress = (address: string) => {
+    if (!address) return '';
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
 
   return (
-    <Card className="overflow-hidden">
-      <CardContent className="p-0">
-        <div className="p-5">
-          <h3 className="font-medium text-sm flex items-center">
-            <Tag className="w-4 h-4 mr-1.5 text-primary" />
-            Base Wallet
-          </h3>
-          <div className="mt-2">
-            <p className="text-2xl font-bold code-font">{balance} <span className="text-muted-foreground text-sm">TOKENS</span></p>
-            <p className="text-muted-foreground mt-1 text-sm code-font truncate">{address}</p>
+    <Card className="h-full shadow-md hover:shadow-lg transition-shadow duration-200 border-purple-900/20 bg-slate-900 text-white">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-xl flex justify-between items-center">
+          <span>My Wallet</span>
+          {isConnected && (
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className="text-purple-400 hover:text-purple-300 hover:bg-purple-900/20 p-1 h-8 w-8"
+              onClick={handleRefresh}
+              disabled={isLoading || refreshing}
+            >
+              {refreshing ? (
+                <Loader2Icon className="h-4 w-4 animate-spin" />
+              ) : (
+                <RefreshCwIcon className="h-4 w-4" />
+              )}
+            </Button>
+          )}
+        </CardTitle>
+        {isConnected && address && (
+          <CardDescription className="text-gray-400">
+            {truncateAddress(address)}
+          </CardDescription>
+        )}
+      </CardHeader>
+      <CardContent>
+        {!isConnected ? (
+          <div className="h-20 flex flex-col items-center justify-center">
+            <p className="text-gray-400 mb-2 text-sm">Connect your wallet to view your balance</p>
           </div>
-        </div>
-        <div className="bg-primary/20 p-4 flex justify-between">
-          <Button 
-            className="bg-primary text-white neon-border-primary"
-            onClick={() => setIsFundRepoDialogOpen(true)}
-          >
-            Fund Repository
-          </Button>
-          <Button 
-            variant="outline" 
-            className="bg-card"
-            onClick={() => setIsWithdrawDialogOpen(true)}
-          >
-            Withdraw
-          </Button>
-        </div>
-      </CardContent>
-
-      {/* Fund Repository Dialog - Will redirect to repository selection */}
-      <Dialog open={isFundRepoDialogOpen} onOpenChange={setIsFundRepoDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Fund a Repository</DialogTitle>
-            <DialogDescription>
-              Select a repository to fund with TOKENS.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="py-4">
-            <p className="text-center text-muted-foreground">
-              Please select a repository from the sidebar or navigate to the repository page directly.
+        ) : isLoading ? (
+          <div className="space-y-2">
+            <Skeleton className="h-8 w-full bg-gray-800" />
+            <Skeleton className="h-4 w-3/4 bg-gray-800" />
+          </div>
+        ) : (
+          <div className="flex flex-col space-y-2">
+            <div className="flex items-baseline">
+              <span className="text-3xl font-bold text-purple-400">
+                {tokenInfo?.balance ? formatBalance(tokenInfo.balance) : '0.00'}
+              </span>
+              <span className="ml-2 text-sm text-gray-400">
+                {tokenInfo?.symbol || 'ROXN'}
+              </span>
+            </div>
+            <p className="text-xs text-gray-500">
+              {tokenInfo?.name || 'Roxonn Token'} • Use to fund repositories and bounties
             </p>
           </div>
-          <DialogFooter>
-            <Button 
-              variant="outline" 
-              onClick={() => setIsFundRepoDialogOpen(false)}
-            >
-              Cancel
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Withdraw Dialog */}
-      <Dialog open={isWithdrawDialogOpen} onOpenChange={setIsWithdrawDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Withdraw Tokens</DialogTitle>
-            <DialogDescription>
-              Enter the amount of TOKENS you want to withdraw to your connected wallet.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="py-4 space-y-4">
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <label className="text-sm font-medium">Amount</label>
-                <span className="text-sm text-muted-foreground">Balance: {balance} TOKENS</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <CircleDollarSign className="w-5 h-5 text-muted-foreground" />
-                <Input
-                  type="number"
-                  placeholder="Amount to withdraw"
-                  value={withdrawAmount}
-                  onChange={(e) => setWithdrawAmount(e.target.value)}
-                  min="1"
-                  max={balance}
-                  className="font-mono"
-                />
-              </div>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button 
-              variant="outline" 
-              onClick={() => setIsWithdrawDialogOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button onClick={handleWithdraw}>
-              Withdraw
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        )}
+      </CardContent>
+      <CardFooter>
+        {!isConnected ? (
+          <Button 
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+            onClick={openConnectModal}
+          >
+            Connect Wallet
+          </Button>
+        ) : (
+          <Button 
+            variant="outline" 
+            className="w-full border-purple-700 text-purple-400 hover:bg-purple-900/20"
+          >
+            Manage Tokens
+          </Button>
+        )}
+      </CardFooter>
     </Card>
   );
 }

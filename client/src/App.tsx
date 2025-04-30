@@ -1,6 +1,4 @@
 import { Switch, Route } from "wouter";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
@@ -12,7 +10,6 @@ import History from "@/pages/history";
 import RepositoryDetail from "@/pages/repository-detail";
 import AddRepository from "@/pages/add-repository";
 import Login from "@/pages/login";
-import { WalletProvider } from "@/hooks/use-wallet";
 import { AuthProvider } from "@/hooks/use-auth";
 import { GithubProvider } from "@/hooks/use-github";
 
@@ -33,20 +30,16 @@ function Router() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <AuthProvider>
-          <GithubProvider>
-            <WalletProvider>
-              <Layout>
-                <Router />
-              </Layout>
-              <Toaster />
-            </WalletProvider>
-          </GithubProvider>
-        </AuthProvider>
-      </TooltipProvider>
-    </QueryClientProvider>
+    <TooltipProvider>
+      <AuthProvider>
+        <GithubProvider>
+          <Layout>
+            <Router />
+          </Layout>
+          <Toaster />
+        </GithubProvider>
+      </AuthProvider>
+    </TooltipProvider>
   );
 }
 

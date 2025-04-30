@@ -1,0 +1,326 @@
+{
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "tokenAddress",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "repoId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "manager",
+          "type": "address"
+        }
+      ],
+      "name": "ManagerAdded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "repoId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "manager",
+          "type": "address"
+        }
+      ],
+      "name": "ManagerRemoved",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "repoId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "manager",
+          "type": "address"
+        }
+      ],
+      "name": "PoolCreated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "repoId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "funder",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "PoolFunded",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "repoId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "manager",
+          "type": "address"
+        }
+      ],
+      "name": "addPoolManager",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "admin",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "repoId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "manager",
+          "type": "address"
+        }
+      ],
+      "name": "createPool",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "repoId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "fundPool",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "repoId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getPoolBalance",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "repoId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "manager",
+          "type": "address"
+        }
+      ],
+      "name": "isPoolManager",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "poolManagers",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "name": "pools",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "repoId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "manager",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "balance",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "exists",
+          "type": "bool"
+        },
+        {
+          "internalType": "uint256",
+          "name": "lastDepositTime",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "repoId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "manager",
+          "type": "address"
+        }
+      ],
+      "name": "removePoolManager",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "token",
+      "outputs": [
+        {
+          "internalType": "contract RoxonnToken",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "6080604052348015600e575f5ffd5b50604051610b61380380610b61833981016040819052602b916057565b5f80546001600160a01b039092166001600160a01b031992831617905560018054909116331790556082565b5f602082840312156066575f5ffd5b81516001600160a01b0381168114607b575f5ffd5b9392505050565b610ad28061008f5f395ff3fe608060405234801561000f575f5ffd5b506004361061009a575f3560e01c8063b5217bb411610063578063b5217bb41461013a578063e7f557f3146101b7578063ec1715b8146101ca578063f851a440146101dd578063fc0c546a14610208575f5ffd5b8062954be11461009e5780632509aa5e146100c657806350428089146100f3578063550e6ed1146101065780636704298414610127575b5f5ffd5b6100b16100ac3660046109c1565b61021a565b60405190151581526020015b60405180910390f35b6100b16100d43660046109c1565b600360209081525f928352604080842090915290825290205460ff1681565b6100b16101013660046109fa565b6103a5565b610119610114366004610a1a565b610560565b6040519081526020016100bd565b6100b16101353660046109c1565b6105a6565b610185610148366004610a1a565b600260208190525f91825260409091208054600182015492820154600383015460049093015491936001600160a01b031692909160ff9091169085565b604080519586526001600160a01b0390941660208601529284019190915215156060830152608082015260a0016100bd565b6100b16101c53660046109c1565b61079d565b6100b16101d83660046109c1565b610938565b6001546101f0906001600160a01b031681565b6040516001600160a01b0390911681526020016100bd565b5f546101f0906001600160a01b031681565b5f82815260026020526040812060030154839060ff166102555760405162461bcd60e51b815260040161024c90610a31565b60405180910390fd5b5f818152600260205260409020600101546001600160a01b031633148061029457505f81815260036020908152604080832033845290915290205460ff165b806102a957506001546001600160a01b031633145b6102f55760405162461bcd60e51b815260206004820152601d60248201527f4e6f7420617574686f72697a656420746f206d616e61676520706f6f6c000000604482015260640161024c565b6001600160a01b0383166103455760405162461bcd60e51b8152602060048201526017602482015276496e76616c6964206d616e61676572206164647265737360481b604482015260640161024c565b5f8481526003602090815260408083206001600160a01b0387168085529252808320805460ff1916600117905551909186917fe46710533b73e7bc8e141ac9ce789902221e6df8529e50ffafa7084c7461dd9f9190a35060019392505050565b5f8281526002602052604081206003015460ff166103d55760405162461bcd60e51b815260040161024c90610a31565b5f82116104245760405162461bcd60e51b815260206004820152601d60248201527f416d6f756e74206d7573742062652067726561746572207468616e2030000000604482015260640161024c565b5f546040516323b872dd60e01b8152336004820152306024820152604481018490526001600160a01b03909116906323b872dd906064016020604051808303815f875af1158015610477573d5f5f3e3d5ffd5b505050506040513d601f19601f8201168201806040525081019061049b9190610a5e565b6104df5760405162461bcd60e51b8152602060048201526015602482015274151bdad95b881d1c985b9cd9995c8819985a5b1959605a1b604482015260640161024c565b5f83815260026020819052604082200180548492906104ff908490610a7d565b90915550505f83815260026020526040908190204260049091015551339084907fb41248cbb9f620dcc228147603ac5c34dbf73c9b90044f38e49c9a862d9f328b9061054e9086815260200190565b60405180910390a35060015b92915050565b5f8181526002602052604081206003015460ff166105905760405162461bcd60e51b815260040161024c90610a31565b505f908152600260208190526040909120015490565b6001545f906001600160a01b0316331461060c5760405162461bcd60e51b815260206004820152602160248201527f4f6e6c792061646d696e2063616e2063616c6c20746869732066756e6374696f6044820152603760f91b606482015260840161024c565b5f8381526002602052604090206003015460ff16156106785760405162461bcd60e51b815260206004820152602260248201527f506f6f6c20616c72656164792065786973747320666f72207265706f7369746f604482015261727960f01b606482015260840161024c565b6001600160a01b0382166106c85760405162461bcd60e51b8152602060048201526017602482015276496e76616c6964206d616e61676572206164647265737360481b604482015260640161024c565b6040805160a0810182528481526001600160a01b0380851660208084018281525f8587018181526001606088018181524260808a019081528d855260028088528b86209a518b5595518a8401805491909a166001600160a01b031990911617909855915193880193909355516003808801805492151560ff1993841617905595516004909701969096559382528584208385529091528483208054909416179092559151909185917fa843b0068d872c047023d406f9e5cea249189566b6fe594909f554578e81656d9190a350600192915050565b5f82815260026020526040812060030154839060ff166107cf5760405162461bcd60e51b815260040161024c90610a31565b5f818152600260205260409020600101546001600160a01b031633148061080e57505f81815260036020908152604080832033845290915290205460ff165b8061082357506001546001600160a01b031633145b61086f5760405162461bcd60e51b815260206004820152601d60248201527f4e6f7420617574686f72697a656420746f206d616e61676520706f6f6c000000604482015260640161024c565b5f848152600260205260409020600101546001600160a01b03908116908416036108db5760405162461bcd60e51b815260206004820152601d60248201527f43616e6e6f742072656d6f7665207072696d617279206d616e61676572000000604482015260640161024c565b5f8481526003602090815260408083206001600160a01b0387168085529252808320805460ff1916905551909186917f09f3834f8c364f78dd28fd9b79eefacfae7a3d41e6f9008d88babfd22bd1f2499190a35060019392505050565b5f8281526002602052604081206003015460ff1661095757505f61055a565b5f8381526003602090815260408083206001600160a01b038616845290915290205460ff16806109a257505f838152600260205260409020600101546001600160a01b038381169116145b806109ba57506001546001600160a01b038381169116145b9392505050565b5f5f604083850312156109d2575f5ffd5b8235915060208301356001600160a01b03811681146109ef575f5ffd5b809150509250929050565b5f5f60408385031215610a0b575f5ffd5b50508035926020909101359150565b5f60208284031215610a2a575f5ffd5b5035919050565b602080825260139082015272141bdbdb08191bd95cc81b9bdd08195e1a5cdd606a1b604082015260600190565b5f60208284031215610a6e575f5ffd5b815180151581146109ba575f5ffd5b8082018082111561055a57634e487b7160e01b5f52601160045260245ffdfea264697066735822122078f1da9dae901c86c3a2d892bd76d0699975cd8cbb3dcd5900f29530c781ccd664736f6c634300081d0033"
+}
