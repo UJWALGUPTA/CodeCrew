@@ -199,21 +199,21 @@ export default function BrowseIssues() {
             <CardContent className="p-6">
               <h3 className="font-medium mb-4">Popular Labels</h3>
               <div className="space-y-2">
-                {popularLabels.map((label: string) => (
-                  <div key={label} className="flex items-center space-x-2">
+                {popularLabels.map((labelObj: any) => (
+                  <div key={labelObj.name} className="flex items-center space-x-2">
                     <Checkbox 
-                      id={`label-${label}`}
-                      checked={labelFilters.includes(label)}
+                      id={`label-${labelObj.name}`}
+                      checked={labelFilters.includes(labelObj.name)}
                       onCheckedChange={(checked) => {
                         if (checked) {
-                          setLabelFilters([...labelFilters, label]);
+                          setLabelFilters([...labelFilters, labelObj.name]);
                         } else {
-                          setLabelFilters(labelFilters.filter(l => l !== label));
+                          setLabelFilters(labelFilters.filter(l => l !== labelObj.name));
                         }
                       }}
                     />
-                    <Label htmlFor={`label-${label}`} className="text-sm cursor-pointer">
-                      {label}
+                    <Label htmlFor={`label-${labelObj.name}`} className="text-sm cursor-pointer">
+                      {labelObj.name} <span className="text-muted-foreground ml-1">({labelObj.count})</span>
                     </Label>
                   </div>
                 ))}

@@ -94,8 +94,8 @@ export default function History() {
   const filteredHistory = history.filter((item: any) => {
     // Filter by search term
     const matchesSearch = searchTerm === "" || 
-      item.issue.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.repository.toLowerCase().includes(searchTerm.toLowerCase());
+      (item.issue && item.issue.title && item.issue.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (item.repository && item.repository.toLowerCase().includes(searchTerm.toLowerCase()));
     
     // Filter by tab
     const matchesTab = activeTab === "all" || activeTab === item.status;
@@ -175,25 +175,42 @@ export default function History() {
                       <TableRow key={item.id}>
                         <TableCell>
                           <div>
-                            <div className="font-medium">{item.repository}</div>
-                            <div className="text-sm text-muted-foreground">{item.issue.title}</div>
+                            <div className="font-medium">{item.repository || "System"}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {item.issue && item.issue.title ? item.issue.title : 
+                               item.type === "deposit" ? `Deposit to repository` :
+                               item.type === "withdrawal" ? "Withdrawal" : "Transaction"}
+                            </div>
                           </div>
                         </TableCell>
                         <TableCell>
-                          {format(new Date(item.completedAt || item.updatedAt), 'MMM d, yyyy')}
+                          {item.date ? format(new Date(item.date), 'MMM d, yyyy') : format(new Date(), 'MMM d, yyyy')}
                         </TableCell>
                         <TableCell>
                           <div className={`font-mono ${item.status === 'completed' ? 'neon-primary text-primary' : 'text-muted-foreground'}`}>
-                            {item.status === 'completed' ? `+${item.issue.reward}` : item.issue.reward} TOKENS
+                            {item.status === 'completed' ? 
+                              (item.reward ? `+${item.reward}` : 
+                               item.amount ? (item.type === 'deposit' ? `-${item.amount}` : `+${item.amount}`) : "0") 
+                              : 
+                              (item.reward || item.amount || "0")} TOKENS
                           </div>
                         </TableCell>
                         <TableCell>
                           {renderStatusBadge(item.status)}
                         </TableCell>
                         <TableCell className="text-right">
-                          <Button variant="outline" size="sm" onClick={() => window.open(item.transactionUrl || item.issue.url, '_blank')}>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => {
+                              const url = item.transactionUrl || 
+                                    (item.transactionHash ? `https://sepolia-explorer.base.org/tx/${item.transactionHash}` : 
+                                    (item.issue && item.issue.url ? item.issue.url : '#'));
+                              if (url !== '#') window.open(url, '_blank');
+                            }}
+                          >
                             <ExternalLink className="w-4 h-4 mr-1" />
-                            {item.status === 'completed' ? 'View TX' : 'View Issue'}
+                            {item.transactionHash || item.transactionUrl ? 'View TX' : 'View Issue'}
                           </Button>
                         </TableCell>
                       </TableRow>
