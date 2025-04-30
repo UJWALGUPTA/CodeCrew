@@ -53,6 +53,7 @@ export default function AddRepository() {
   const queryClient = useQueryClient();
   const [isAdding, setIsAdding] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedRepository, setSelectedRepository] = useState<Repository | null>(null);
 
   // Fetch GitHub repositories
   const { data: githubRepos = [], isLoading: isLoadingRepos, refetch: refetchRepos } = useQuery<Repository[]>({
@@ -312,10 +313,29 @@ export default function AddRepository() {
 
             {form.getValues("repositoryUrl") && (
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 border rounded-lg p-4 bg-muted/10">
-                  <div className="text-sm mb-2">
-                    <div className="font-medium">Selected Repository:</div>
-                    <div className="text-primary">{form.getValues("repositoryUrl")}</div>
+                <form id="repository-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 border rounded-lg p-4 bg-muted/10">
+                  <div className="text-sm mb-3">
+                    <div className="font-medium mb-1">Selected Repository:</div>
+                    {selectedRepository ? (
+                      <div className="flex items-start gap-2 p-2 rounded bg-muted/30">
+                        <div className="flex-1">
+                          <div className="font-medium text-primary">{selectedRepository.fullName}</div>
+                          <div className="text-xs text-muted-foreground mt-1">{selectedRepository.description || 'No description'}</div>
+                        </div>
+                        <div className="flex items-center space-x-2 text-xs text-muted-foreground">
+                          <div className="flex items-center">
+                            <Star className="h-3 w-3 mr-1" />
+                            {selectedRepository.stars || 0}
+                          </div>
+                          <div className="flex items-center">
+                            <GitFork className="h-3 w-3 mr-1" />
+                            {selectedRepository.forks || 0}
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-primary">{form.getValues("repositoryUrl")}</div>
+                    )}
                   </div>
                   
                   <FormField
@@ -323,7 +343,7 @@ export default function AddRepository() {
                     name="initialFunding"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Initial Funding (TOKENS)</FormLabel>
+                        <FormLabel>Initial Funding (CREW Tokens)</FormLabel>
                         <FormControl>
                           <Input 
                             type="number" 
@@ -333,7 +353,7 @@ export default function AddRepository() {
                           />
                         </FormControl>
                         <FormDescription>
-                          Amount of tokens to add to the repository reward pool
+                          Amount of CREW tokens to add to the repository reward pool
                         </FormDescription>
                         <FormMessage />
                       </FormItem>

@@ -1,47 +1,74 @@
+import { useState } from 'react';
 import { Button } from "@/components/ui/button";
+import { Wallet, Loader2 } from "lucide-react";
 import { useWallet } from "@/hooks/use-wallet";
-import { Loader2, Wallet } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { truncateAddress } from "@/lib/utils";
 
-export default function WalletConnectButton() {
-  const { balance, address, isConnected, isConnecting, connect, disconnect } = useWallet();
+export function WalletConnectButton() {
+  const { isConnected, isConnecting, connect, disconnect, address, balance } = useWallet();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const handleConnect = () => {
-    if (isConnected) {
-      disconnect();
-    } else {
-      connect();
-    }
-  };
-
-  // Format address to show only the first 6 and last 4 characters
-  const formatAddress = (addr: string) => {
-    return addr ? `${addr.slice(0, 6)}...${addr.slice(-4)}` : "";
-  };
+  if (!isConnected) {
+    return (
+      <Button
+        variant="default"
+        size="sm"
+        onClick={connect}
+        disabled={isConnecting}
+      >
+        {isConnecting ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Connecting...
+          </>
+        ) : (
+          <>
+            <Wallet className="mr-2 h-4 w-4" />
+            Connect Wallet
+          </>
+        )}
+      </Button>
+    );
+  }
 
   return (
-    <Button
-      onClick={handleConnect}
-      className={`flex items-center space-x-2 ${isConnected ? 'bg-primary hover:bg-primary/80 text-white neon-border-primary' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
-      disabled={isConnecting}
-    >
-      {isConnecting ? (
-        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-      ) : (
-        <Wallet className="mr-2 h-4 w-4" />
-      )}
-      
-      {isConnecting ? (
-        "Connecting..."
-      ) : isConnected ? (
-        <>
-          <span>{formatAddress(address)}</span>
-          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-card text-foreground">
-            {balance} <span className="ml-1 text-xs text-muted-foreground">TOKENS</span>
-          </span>
-        </>
-      ) : (
-        "Connect Wallet"
-      )}
-    </Button>
+    <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="sm" className="text-primary">
+          <Wallet className="mr-2 h-4 w-4" />
+          {truncateAddress(address)}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuLabel>Wallet</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem className="cursor-default flex justify-between">
+          <span>Address:</span>
+          <span className="font-mono text-xs">{truncateAddress(address)}</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem className="cursor-default flex justify-between">
+          <span>Balance:</span>
+          <span>{balance} CREW</span>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem 
+          className="text-destructive focus:text-destructive cursor-pointer"
+          onClick={() => {
+            disconnect();
+            setIsDropdownOpen(false);
+          }}
+        >
+          Disconnect
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
