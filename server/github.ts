@@ -7,16 +7,20 @@ class GitHubClient {
   private appId: string;
   private privateKey: string;
   private webhookSecret: string;
+  private appName: string;
   
   constructor() {
     // Set up GitHub App credentials
     this.appId = process.env.GITHUB_APP_ID || '';
     this.privateKey = process.env.GITHUB_APP_PRIVATE_KEY?.replace(/\\n/g, '\n') || '';
     this.webhookSecret = process.env.GITHUB_WEBHOOK_SECRET || '';
+    this.appName = process.env.GITHUB_APP_NAME || 'codecrewai';
     
     if (!this.appId || !this.privateKey || !this.webhookSecret) {
       console.warn('GitHub App credentials missing. Some functionality may not work.');
     }
+    
+    console.log(`GitHub App configuration loaded. App name: ${this.appName}`);
   }
   
   /**
