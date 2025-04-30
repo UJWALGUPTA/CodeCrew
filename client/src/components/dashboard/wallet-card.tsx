@@ -13,9 +13,10 @@ import { Input } from "@/components/ui/input";
 import { useWallet } from "@/hooks/use-wallet";
 import { Tag, CircleDollarSign } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import WalletConnectButton from "@/components/wallet/wallet-connect-button";
 
 export default function WalletCard() {
-  const { balance, address, disconnect } = useWallet();
+  const { balance, address, isConnected } = useWallet();
   const { toast } = useToast();
   const [isFundRepoDialogOpen, setIsFundRepoDialogOpen] = useState(false);
   const [isWithdrawDialogOpen, setIsWithdrawDialogOpen] = useState(false);
@@ -40,6 +41,22 @@ export default function WalletCard() {
     
     setIsWithdrawDialogOpen(false);
   };
+
+  // If wallet is not connected, show a connect button instead
+  if (!isConnected) {
+    return (
+      <Card className="overflow-hidden">
+        <CardContent className="p-5 flex flex-col items-center justify-center gap-4">
+          <h3 className="font-medium text-sm flex items-center">
+            <Tag className="w-4 h-4 mr-1.5 text-primary" />
+            Base Wallet
+          </h3>
+          <p className="text-center text-muted-foreground">Connect your wallet to fund repositories and claim bounties</p>
+          <WalletConnectButton />
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="overflow-hidden">

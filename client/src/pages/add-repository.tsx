@@ -52,7 +52,7 @@ export default function AddRepository() {
   const { isConnected: isGithubConnected, connect: connectGithub, fetchUserRepositories } = useGithub();
   const queryClient = useQueryClient();
   const [isAdding, setIsAdding] = useState(false);
-  const [activeTab, setActiveTab] = useState<string>("manual");
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Fetch GitHub repositories
   const { data: githubRepos = [], isLoading: isLoadingRepos, refetch: refetchRepos } = useQuery<Repository[]>({
@@ -204,17 +204,8 @@ export default function AddRepository() {
             </Alert>
           )}
 
-          <Tabs 
-            value={activeTab} 
-            onValueChange={setActiveTab} 
-            className="mb-6"
-          >
-            <TabsList className="grid grid-cols-2">
-              <TabsTrigger value="select">Select Repository</TabsTrigger>
-              <TabsTrigger value="manual">Manual Entry</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="select" className="space-y-4 mt-4">
+          <div className="space-y-6">
+            <div className="space-y-4">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-medium">Your GitHub Repositories</h3>
                 <Button 
@@ -227,6 +218,20 @@ export default function AddRepository() {
                   Refresh
                 </Button>
               </div>
+
+              <div className="relative mb-4">
+                <Input
+                  placeholder="Search repositories..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                  <svg className="h-5 w-5 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+              </div>
               
               {isLoadingRepos ? (
                 <div className="space-y-3">
@@ -236,27 +241,33 @@ export default function AddRepository() {
                 </div>
               ) : githubRepos && githubRepos.length > 0 ? (
                 <div className="space-y-3">
-                  {githubRepos.map((repo: Repository) => (
-                    <Card key={repo.id} className="hover:border-primary cursor-pointer transition-all" onClick={() => handleSelectRepository(repo)}>
-                      <CardContent className="p-4">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <div className="font-medium">{repo.fullName}</div>
-                            <div className="text-sm text-muted-foreground line-clamp-1 mt-1">{repo.description || 'No description'}</div>
-                          </div>
-                          <div className="flex items-center space-x-3 text-xs text-muted-foreground">
-                            <div className="flex items-center">
-                              <Star className="h-3.5 w-3.5 mr-1" />
-                              {repo.stars || 0}
+                  {githubRepos
+                    .filter(repo => 
+                      searchQuery === "" || 
+                      repo.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      (repo.description && repo.description.toLowerCase().includes(searchQuery.toLowerCase()))
+                    )
+                    .map((repo: Repository) => (
+                      <Card key={repo.id} className="hover:border-primary cursor-pointer transition-all" onClick={() => handleSelectRepository(repo)}>
+                        <CardContent className="p-4">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <div className="font-medium">{repo.fullName}</div>
+                              <div className="text-sm text-muted-foreground line-clamp-1 mt-1">{repo.description || 'No description'}</div>
                             </div>
-                            <div className="flex items-center">
-                              <GitFork className="h-3.5 w-3.5 mr-1" />
-                              {repo.forks || 0}
+                            <div className="flex items-center space-x-3 text-xs text-muted-foreground">
+                              <div className="flex items-center">
+                                <Star className="h-3.5 w-3.5 mr-1" />
+                                {repo.stars || 0}
+                              </div>
+                              <div className="flex items-center">
+                                <GitFork className="h-3.5 w-3.5 mr-1" />
+                                {repo.forks || 0}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </CardContent>
-                    </Card>
+                        </CardContent>
+                      </Card>
                   ))}
                 </div>
               ) : (
@@ -274,30 +285,15 @@ export default function AddRepository() {
                   )}
                 </div>
               )}
-            </TabsContent>
-            
-            <TabsContent value="manual">
+            </div>
+
+            {form.getValues("repositoryUrl") && (
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  <FormField
-                    control={form.control}
-                    name="repositoryUrl"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Repository URL</FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder="https://github.com/username/repository" 
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          Enter the full URL of your GitHub repository
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 border rounded-lg p-4 bg-muted/10">
+                  <div className="text-sm mb-2">
+                    <div className="font-medium">Selected Repository:</div>
+                    <div className="text-primary">{form.getValues("repositoryUrl")}</div>
+                  </div>
                   
                   <FormField
                     control={form.control}
@@ -343,8 +339,8 @@ export default function AddRepository() {
                   </Button>
                 </form>
               </Form>
-            </TabsContent>
-          </Tabs>
+            )}
+          </div>
         </CardContent>
       </Card>
     </div>
