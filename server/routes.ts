@@ -165,6 +165,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { fullName, name, owner, url } = req.body;
       
+      console.log("Creating repository:", { fullName, name, owner, url });
+      
       if (!fullName || !name || !owner || !url) {
         return res.status(400).json({ message: "Missing required repository information" });
       }
@@ -172,7 +174,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if repository already exists
       const existingRepo = await storage.getRepositoryByFullName(fullName);
       if (existingRepo) {
-        return res.json(existingRepo); // Return existing repo
+        console.log("Repository already exists:", existingRepo);
+        return res.status(200).json(existingRepo); // Return existing repo with 200 status
       }
       
       // Get the user
@@ -194,14 +197,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         isPrivate: null
       });
       
+      console.log("Repository created:", repository);
+      
+      // Verify the repository was created with an ID
+      if (!repository || !repository.id) {
+        console.error("Repository created without ID");
+        return res.status(500).json({ 
+          message: "Repository was created but no ID was returned",
+          repository: repository
+        });
+      }
+      
       // If user has GitHub access token, set up webhook
       if (user.accessToken) {
         try {
           // Use our reusable URL function to determine the webhook URL
           const webhookUrl = getReplicationUrl(req, '/api/github/webhook');
           
+          console.log(`Setting up webhook for ${fullName} to ${webhookUrl}`);
+          
           // Create webhook for the repository
-          await githubClient.createWebhook(owner, name, user.accessToken, webhookUrl);
+          const webhook = await githubClient.createWebhook(owner, name, user.accessToken, webhookUrl);
+          console.log(`Created webhook for ${fullName} with ID ${webhook?.id}`);
           console.log(`Created webhook for ${fullName} pointing to ${webhookUrl}`);
         } catch (webhookError) {
           console.error(`Failed to create webhook for ${fullName}:`, webhookError);

@@ -262,19 +262,31 @@ export default function AddRepository() {
           
           {isGithubConnected && (
             <Alert className="mb-6">
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Install GitHub App</AlertTitle>
-              <AlertDescription className="flex items-center">
-                Install the CodeCrew GitHub App to enable repository management and bounty tracking.
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="ml-2"
-                  onClick={() => window.open("https://github.com/apps/codecrewai", "_blank")}
-                >
-                  <Github className="mr-2 h-4 w-4" />
-                  Install GitHub App
-                </Button>
+              <Github className="h-4 w-4" />
+              <AlertTitle>Important: Install CodeCrew App on Your Repositories</AlertTitle>
+              <AlertDescription>
+                <p className="mb-2">
+                  Before adding a repository, please install the CodeCrew GitHub App on your specific repositories. 
+                  This is required to track issues, pull requests, and manage bounties properly.
+                </p>
+                <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
+                  <Button 
+                    variant="default" 
+                    size="sm"
+                    onClick={() => window.open("https://github.com/apps/codecrewai", "_blank")}
+                  >
+                    <Github className="mr-2 h-4 w-4" />
+                    Install App on Repositories
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => window.open("https://github.com/apps/codecrewai/installations/new", "_blank")}
+                  >
+                    <span className="mr-2">⚙️</span>
+                    Configure App Settings
+                  </Button>
+                </div>
               </AlertDescription>
             </Alert>
           )}
@@ -388,21 +400,40 @@ export default function AddRepository() {
                   <div className="text-sm mb-3">
                     <div className="font-medium mb-1">Selected Repository:</div>
                     {selectedRepository ? (
-                      <div className="flex items-start gap-2 p-2 rounded bg-muted/30">
-                        <div className="flex-1">
-                          <div className="font-medium text-primary">{selectedRepository.fullName}</div>
-                          <div className="text-xs text-muted-foreground mt-1">{selectedRepository.description || 'No description'}</div>
-                        </div>
-                        <div className="flex items-center space-x-2 text-xs text-muted-foreground">
-                          <div className="flex items-center">
-                            <Star className="h-3 w-3 mr-1" />
-                            {selectedRepository.stars || 0}
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-start gap-2 p-2 rounded bg-muted/30">
+                          <div className="flex-1">
+                            <div className="font-medium text-primary">{selectedRepository.fullName}</div>
+                            <div className="text-xs text-muted-foreground mt-1">{selectedRepository.description || 'No description'}</div>
                           </div>
-                          <div className="flex items-center">
-                            <GitFork className="h-3 w-3 mr-1" />
-                            {selectedRepository.forks || 0}
+                          <div className="flex items-center space-x-2 text-xs text-muted-foreground">
+                            <div className="flex items-center">
+                              <Star className="h-3 w-3 mr-1" />
+                              {selectedRepository.stars || 0}
+                            </div>
+                            <div className="flex items-center">
+                              <GitFork className="h-3 w-3 mr-1" />
+                              {selectedRepository.forks || 0}
+                            </div>
                           </div>
                         </div>
+                        <Button 
+                          type="button"
+                          variant="outline" 
+                          size="sm"
+                          className="text-xs"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // Use the proper url for repository-level installation
+                            const [owner, repo] = selectedRepository.fullName.split('/');
+                            if (owner && repo) {
+                              window.open(`https://github.com/apps/codecrewai/installations/new/permissions?target_id=${owner}`, "_blank");
+                            }
+                          }}
+                        >
+                          <Github className="mr-2 h-3 w-3" />
+                          Install GitHub App on This Repository
+                        </Button>
                       </div>
                     ) : (
                       <div className="text-primary">{form.getValues("repositoryUrl")}</div>
