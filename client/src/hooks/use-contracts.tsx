@@ -5,11 +5,11 @@ import { createPublicClient, http, createWalletClient, custom } from 'viem';
 import { baseGoerli } from 'viem/chains';
 import { formatUnits, parseUnits, stringToHex, hexToString } from 'viem';
 import { 
-  ROXONN_TOKEN_ADDRESS, 
+  CODECREW_TOKEN_ADDRESS, 
   REWARD_POOL_MANAGER_ADDRESS, 
   BOUNTY_CONTRACT_ADDRESS 
 } from '@/lib/contracts/artifacts/contract-addresses';
-import RoxonnTokenABI from '@/lib/contracts/artifacts/RoxonnTokenABI.json';
+import CodeCrewTokenABI from '@/lib/contracts/artifacts/RoxonnTokenABI.json';
 import RewardPoolManagerABI from '@/lib/contracts/artifacts/RewardPoolManagerABI.json';
 import BountyContractABI from '@/lib/contracts/artifacts/BountyContractABI.json';
 import { useToast } from '@/hooks/use-toast';
@@ -181,7 +181,7 @@ export function useContracts() {
       setTimeout(() => {
         toast({
           title: "Success",
-          description: `Bounty created with ${amount} ROXN.`,
+          description: `Bounty created with ${amount} CREW.`,
         });
         setIsLoading(false);
       }, 1200);
