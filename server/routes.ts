@@ -150,6 +150,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch GitHub repositories" });
     }
   });
+  
+  // Route to get GitHub App details
+  app.get("/api/github/app-details", async (req: Request, res: Response) => {
+    try {
+      const appDetails = githubClient.getAppDetails();
+      res.json(appDetails);
+    } catch (error) {
+      console.error("Error fetching GitHub App details:", error);
+      res.status(500).json({ message: "Failed to fetch GitHub App details" });
+    }
+  });
+  
+  // Check if GitHub App is installed for a repository
+  app.get("/api/github/check-app-installed/:owner/:repo", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const { owner, repo } = req.params;
+      const isInstalled = await githubClient.isAppInstalledForRepo(owner, repo);
+      res.json({ 
+        installed: isInstalled,
+        installUrl: `https://github.com/apps/${process.env.GITHUB_APP_NAME}/installations/new/permissions?target_id=${owner}`
+      });
+    } catch (error) {
+      console.error("Error checking if GitHub App is installed:", error);
+      res.status(500).json({ message: "Failed to check if GitHub App is installed" });
+    }
+  });
+  
+  // Get issues for a repository directly from GitHub API
+  app.get("/api/github/repo-issues/:owner/:repo", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const { owner, repo } = req.params;
+      
+      // First check if the app is installed
+      const isInstalled = await githubClient.isAppInstalledForRepo(owner, repo);
+      if (!isInstalled) {
+        return res.status(400).json({
+          message: "GitHub App not installed for this repository",
+          installUrl: `https://github.com/apps/${process.env.GITHUB_APP_NAME}/installations/new/permissions?target_id=${owner}`
+        });
+      }
+      
+      // Fetch issues from GitHub
+      const issues = await githubClient.fetchRepoIssuesFromGithub(owner, repo);
+      
+      // Format the issues before returning them
+      const formattedIssues = issues.map((issue: any) => ({
+        id: issue.id,
+        number: issue.number,
+        title: issue.title,
+        body: issue.body,
+        url: issue.html_url,
+        state: issue.state,
+        labels: issue.labels.map((label: any) => label.name),
+        createdAt: issue.created_at,
+        updatedAt: issue.updated_at
+      }));
+      
+      res.json(formattedIssues);
+    } catch (error) {
+      console.error("Error fetching repository issues from GitHub:", error);
+      res.status(500).json({ message: "Failed to fetch repository issues from GitHub" });
+    }
+  });
 
   app.get("/api/repositories", isAuthenticated, async (req: Request, res: Response) => {
     try {

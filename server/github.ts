@@ -456,6 +456,78 @@ class GitHubClient {
       sha: "abc123",
     };
   }
+  
+  /**
+   * Get app installation details
+   */
+  getAppDetails() {
+    return {
+      name: this.appName,
+      installUrl: `https://github.com/apps/${this.appName}/installations/new`,
+      configUrl: `https://github.com/apps/${this.appName}/installations/new`,
+      repoInstallUrl: (owner: string) => 
+        `https://github.com/apps/${this.appName}/installations/new/permissions?target_id=${owner}`,
+    };
+  }
+  
+  /**
+   * Check if the GitHub App is installed for a repository
+   */
+  async isAppInstalledForRepo(owner: string, repo: string): Promise<boolean> {
+    try {
+      const jwt = this.generateJWT();
+      
+      const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/installation`, {
+        headers: {
+          'Authorization': `Bearer ${jwt}`,
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      });
+      
+      return response.status === 200;
+    } catch (error) {
+      console.error("Error checking if app is installed for repo:", error);
+      return false;
+    }
+  }
+  
+  /**
+   * Get repository issues from GitHub API
+   */
+  async fetchRepoIssuesFromGithub(owner: string, repo: string): Promise<any[]> {
+    try {
+      // First check if app is installed
+      const isInstalled = await this.isAppInstalledForRepo(owner, repo);
+      if (!isInstalled) {
+        console.log(`GitHub App not installed for ${owner}/${repo}`);
+        return [];
+      }
+      
+      // Get installation ID and token
+      const installationId = await this.getInstallationIdForRepo(owner, repo);
+      const token = await this.getInstallationToken(installationId);
+      
+      // Fetch issues
+      const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/issues?state=open`, {
+        headers: {
+          'Authorization': `token ${token}`,
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      });
+      
+      if (!response.ok) {
+        console.error(`Error fetching issues for ${owner}/${repo}: ${response.status}`);
+        return [];
+      }
+      
+      const issues = await response.json();
+      console.log(`Fetched ${issues.length} issues for ${owner}/${repo}`);
+      return issues;
+    } catch (error) {
+      console.error(`Error fetching issues from GitHub for ${owner}/${repo}:`, error);
+      return [];
+    }
+  }
 }
 
 export const githubClient = new GitHubClient();
