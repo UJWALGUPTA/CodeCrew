@@ -14,15 +14,21 @@ declare module "express-session" {
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
 const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
 
-// Get the base URL from environment or construct from request
-function getCallbackUrl(req: Request) {
+// Get the URL from environment or construct from request
+// This function can be used for both OAuth callbacks and webhook URLs
+export function getReplicationUrl(req: Request, path: string) {
   if (process.env.REPLIT_DEPLOYMENT_ID) {
     // We're on a deployed Replit instance
-    return `https://${process.env.REPLIT_DOMAINS?.split(',')[0] || req.headers.host}/api/auth/github/callback`;
+    return `https://${process.env.REPLIT_DOMAINS?.split(',')[0] || req.headers.host}${path}`;
   } else {
     // We're in development
-    return `http://${req.headers.host}/api/auth/github/callback`;
+    return `http://${req.headers.host}${path}`;
   }
+}
+
+// Get the OAuth callback URL
+function getCallbackUrl(req: Request) {
+  return getReplicationUrl(req, '/api/auth/github/callback');
 }
 
 export const startGithubOAuth = (req: Request, res: Response) => {

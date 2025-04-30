@@ -21,7 +21,7 @@ export const REWARD_POOL_MANAGER_ADDRESS = import.meta.env.VITE_REWARD_POOL_MANA
 export const BOUNTY_CONTRACT_ADDRESS = import.meta.env.VITE_BOUNTY_CONTRACT_ADDRESS || "0x0000000000000000000000000000000000000002";
 
 // Base Chain RPC URL and Chain ID
-export const BASE_RPC_URL = import.meta.env.VITE_BASE_RPC_URL || "https://goerli.base.org";
+export const BASE_RPC_URL = import.meta.env.VITE_BASE_RPC_URL || "https://base-goerli.public.blastapi.io";
 export const BASE_CHAIN_ID = 84531; // Base Goerli testnet
 
 // Interface to represent wallet providers (MetaMask, WalletConnect, etc.)

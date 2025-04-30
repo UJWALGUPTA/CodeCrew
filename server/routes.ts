@@ -162,10 +162,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // If user has GitHub access token, set up webhook
       if (user.accessToken) {
         try {
-          // Determine the webhook URL
-          const hostname = req.headers.host;
-          const protocol = process.env.REPLIT_DEPLOYMENT_ID ? 'https' : 'http';
-          const webhookUrl = `${protocol}://${hostname}/api/github/webhook`;
+          // Determine the webhook URL using Replit domains or host
+          let webhookUrl;
+          if (process.env.REPLIT_DEPLOYMENT_ID) {
+            // Use the first domain in the comma-separated REPLIT_DOMAINS env var
+            const domain = process.env.REPLIT_DOMAINS?.split(',')[0] || req.headers.host;
+            webhookUrl = `https://${domain}/api/github/webhook`;
+          } else {
+            // Local development
+            webhookUrl = `http://${req.headers.host}/api/github/webhook`;
+          }
           
           // Create webhook for the repository
           await githubClient.createWebhook(owner, name, user.accessToken, webhookUrl);

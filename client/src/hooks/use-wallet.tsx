@@ -87,13 +87,20 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       // Create Web3 provider
       const web3Provider = new ethers.BrowserProvider(window.ethereum);
       
-      // Check if connected to Base chain
-      const isBaseChain = await checkBaseChainConfig(web3Provider);
-      if (!isBaseChain) {
-        const added = await addBaseChainToWallet(window.ethereum);
-        if (!added) {
-          throw new Error("Please switch to Base Chain to use this app");
+      try {
+        // Check if connected to Base chain
+        const isBaseChain = await checkBaseChainConfig(web3Provider);
+        if (!isBaseChain) {
+          const added = await addBaseChainToWallet(window.ethereum);
+          if (!added) {
+            // User may have rejected the chain switch, but we can still try to continue
+            console.warn("User declined to add Base Chain. App may not function correctly.");
+            // Don't throw error here, let users use the app even if not on Base
+          }
         }
+      } catch (chainError) {
+        // Don't block the user from connecting just because chain switching failed
+        console.warn("Chain configuration error:", chainError);
       }
       
       // Get the signer
