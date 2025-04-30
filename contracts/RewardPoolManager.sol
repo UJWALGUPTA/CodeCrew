@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import "./RoxonnToken.sol";
+import "./CodeCrewToken.sol";
 
 /**
  * @title RewardPoolManager
@@ -9,7 +9,7 @@ import "./RoxonnToken.sol";
  */
 contract RewardPoolManager {
     // Token contract reference
-    RoxonnToken public token;
+    CodeCrewToken public token;
     
     // Platform admin
     address public admin;
@@ -39,7 +39,7 @@ contract RewardPoolManager {
      * @dev Constructor to set token contract and admin
      */
     constructor(address tokenAddress) {
-        token = RoxonnToken(tokenAddress);
+        token = CodeCrewToken(tokenAddress);
         admin = msg.sender;
     }
     

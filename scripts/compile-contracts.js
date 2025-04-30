@@ -132,7 +132,7 @@ function saveArtifacts(artifacts) {
 function mockDeployment() {
   // Generate mock addresses for the contracts
   const mockAddresses = {
-    RoxonnToken: '0x1234567890123456789012345678901234567890',
+    CodeCrewToken: '0x1234567890123456789012345678901234567890',
     RewardPoolManager: '0x2345678901234567890123456789012345678901',
     BountyContract: '0x3456789012345678901234567890123456789012'
   };
@@ -156,7 +156,7 @@ function mockDeployment() {
   fs.writeFileSync(
     clientAddressesTsPath,
     `// Auto-generated contract addresses
-export const ROXONN_TOKEN_ADDRESS = '${mockAddresses.RoxonnToken}';
+export const CODECREW_TOKEN_ADDRESS = '${mockAddresses.CodeCrewToken}';
 export const REWARD_POOL_MANAGER_ADDRESS = '${mockAddresses.RewardPoolManager}';
 export const BOUNTY_CONTRACT_ADDRESS = '${mockAddresses.BountyContract}';
 `
