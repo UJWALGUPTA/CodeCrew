@@ -945,7 +945,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             repo.owner,
             repo.name,
             pr.number,
-            `Thanks for submitting a PR for issue #${issueNumber}, which has a bounty of ${issue.reward} ROXN tokens!`
+            `Thanks for submitting a PR for issue #${issueNumber}, which has a bounty of ${issue.reward} CREW tokens!`
           );
         } else if (claim) {
           // Update the existing claim with PR info
@@ -973,7 +973,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             repo.owner,
             repo.name,
             pr.number,
-            `Congratulations! Your PR has been merged and the bounty of ${issue.reward} ROXN tokens will be transferred to your wallet.`
+            `Congratulations! Your PR has been merged and the bounty of ${issue.reward} CREW tokens will be transferred to your wallet.`
           );
         } else if (!pr.merged && claim) {
           // The PR was closed without merging

@@ -20,7 +20,7 @@ const queryClient = new QueryClient({
 
 // Configure chains & providers for Rainbow Kit
 const config = getDefaultConfig({
-  appName: 'ROXONN',
+  appName: 'CodeCrew',
   projectId: 'bounty-platform',
   chains: [base, baseGoerli],
   transports: {
@@ -34,7 +34,7 @@ createRoot(document.getElementById("root")!).render(
     <WagmiConfig config={config}>
       <RainbowKitProvider
         theme={darkTheme({
-          accentColor: '#6E40C9', // Base chain purple
+          accentColor: '#3B82F6', // Primary blue
           accentColorForeground: 'white',
           borderRadius: 'medium',
           fontStack: 'system',
