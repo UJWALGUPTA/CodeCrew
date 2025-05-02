@@ -439,18 +439,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
             
             // Convert GitHub issues to our format
             issues = githubIssues.map((ghIssue: any) => ({
-              id: ghIssue.id.toString(),
+              id: parseInt(ghIssue.id.toString()),
               repositoryId: repoId,
-              number: ghIssue.number,
+              issueNumber: ghIssue.number,
               title: ghIssue.title,
               description: ghIssue.body,
               state: ghIssue.state,
               url: ghIssue.html_url,
-              createdAt: ghIssue.created_at,
-              updatedAt: ghIssue.updated_at,
+              createdAt: new Date(ghIssue.created_at),
+              updatedAt: new Date(ghIssue.updated_at),
               hasBounty: false,
               reward: 0,
-              type: "feature"
+              type: "feature",
+              number: ghIssue.number, // For backward compatibility
+              bountyAddedAt: null
             }));
             
             console.log(`Fetched ${issues.length} issues from GitHub for ${repository.fullName}`);
