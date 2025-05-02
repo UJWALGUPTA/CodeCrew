@@ -40,10 +40,6 @@ interface Repository {
 
 const formSchema = z.object({
   repositoryUrl: z.string().url("Please enter a valid GitHub URL").startsWith("https://github.com/", "Must be a GitHub repository URL"),
-  initialFunding: z.string().refine(
-    (val) => !isNaN(Number(val)) && Number(val) > 0,
-    { message: "Initial funding must be a positive number" }
-  ),
 });
 
 export default function AddRepository() {
@@ -112,6 +108,19 @@ export default function AddRepository() {
     }
   };
   
+  // Fetch existing repositories that have already been added to the platform
+  const { data: existingRepos = [] } = useQuery({
+    queryKey: ["/api/repositories"],
+    queryFn: async () => {
+      const response = await fetch("/api/repositories");
+      if (!response.ok) {
+        throw new Error("Failed to fetch existing repositories");
+      }
+      return response.json();
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+
   // Fetch GitHub repositories
   const { data: githubRepos = [], isLoading: isLoadingRepos, refetch: refetchRepos, error: reposError } = useQuery<Repository[]>({
     queryKey: ["/api/github/repositories"], // Use authenticated repository endpoint
@@ -132,7 +141,10 @@ export default function AddRepository() {
         
         const data = await response.json();
         console.log(`Received ${data.length} repositories from GitHub API:`, data);
-        return data;
+        
+        // Filter out repositories that have already been added to the platform
+        const existingRepoNames = existingRepos.map((repo: any) => repo.fullName);
+        return data.filter((repo: Repository) => !existingRepoNames.includes(repo.fullName));
       } catch (error) {
         console.error("Error fetching repositories:", error);
         throw error;
@@ -148,7 +160,6 @@ export default function AddRepository() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       repositoryUrl: "",
-      initialFunding: "100",
     },
   });
 
@@ -166,7 +177,7 @@ export default function AddRepository() {
       
       const fullName = `${owner}/${repo}`;
       
-      // First, create the repository
+      // Create the repository
       const repository: any = await apiRequest("POST", "/api/repositories", {
         fullName,
         name: repo,
@@ -175,39 +186,13 @@ export default function AddRepository() {
       });
       
       console.log("Repository created:", repository);
-      
-      // Check if we have a valid repository ID before trying to fund it
-      if (repository && repository.id) {
-        // Only attempt to fund if we have a valid repository ID
-        try {
-          // Then fund it
-          await apiRequest("POST", `/api/repositories/${repository.id}/fund`, {
-            amount: Number(values.initialFunding),
-          });
-          console.log("Repository funded successfully");
-        } catch (fundingError) {
-          console.error("Error funding repository:", fundingError);
-          toast({
-            title: "Repository added, but funding failed",
-            description: "The repository was added, but there was an error funding it. You can try funding it later.",
-            variant: "destructive",
-          });
-        }
-      } else {
-        console.warn("Repository object doesn't have ID, skipping funding step", repository);
-        toast({
-          title: "Repository added",
-          description: "The repository was added without initial funding. You can fund it later.",
-        });
-      }
-      
       return repository;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/repositories"] });
       toast({
         title: "Repository added",
-        description: "The repository has been added and funded successfully.",
+        description: "The repository has been added successfully. You can now fund it and assign bounties to issues.",
       });
       navigate("/");
     },
@@ -540,27 +525,7 @@ export default function AddRepository() {
                     )}
                   </div>
                   
-                  <FormField
-                    control={form.control}
-                    name="initialFunding"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Initial Funding (CREW Tokens)</FormLabel>
-                        <FormControl>
-                          <Input 
-                            type="number" 
-                            min="0"
-                            step="1"
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          Amount of CREW tokens to add to the repository reward pool
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  {/* Repository will be funded later */}
                   
                   <Button 
                     type="submit" 
