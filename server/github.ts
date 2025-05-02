@@ -1,6 +1,6 @@
 import { storage } from "./storage";
 import * as crypto from 'crypto';
-import * as jwt from 'jsonwebtoken';
+import jsonwebtoken from 'jsonwebtoken';
 
 // GitHub client for the CodeCrew project - enhanced with GitHub App support
 class GitHubClient {
@@ -34,7 +34,7 @@ class GitHubClient {
       iss: this.appId
     };
     
-    return jwt.sign(payload, this.privateKey, { algorithm: 'RS256' });
+    return jsonwebtoken.sign(payload, this.privateKey, { algorithm: 'RS256' });
   }
   
   /**
@@ -466,7 +466,9 @@ class GitHubClient {
       name: this.appName,
       installUrl: `https://github.com/apps/${this.appName}/installations/new`,
       configUrl: `https://github.com/apps/${this.appName}/installations/new`,
-      repoInstallUrlTemplate: `https://github.com/apps/${this.appName}/installations/new/permissions?target_id={owner}`,
+      // For repository-specific installations, we need just the general installation URL
+      // GitHub will automatically guide the user to choose the repository after login
+      repoInstallUrlTemplate: `https://github.com/apps/${this.appName}/installations/new`,
     };
   }
   
