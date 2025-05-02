@@ -27,76 +27,10 @@ export default function MyClaims() {
   const [currentClaim, setCurrentClaim] = useState<any>(null);
   const [isPrDialogOpen, setIsPrDialogOpen] = useState(false);
   const [prUrl, setPrUrl] = useState("");
-  
-  // Sample claims data for the demo
-  const sampleClaims = [
-    {
-      id: 1,
-      issue: {
-        id: 1,
-        title: "Fix documentation for React",
-        url: "https://github.com/facebook/react/issues/1",
-        reward: 100
-      },
-      repository: "facebook/react",
-      status: "claimed",
-      prUrl: null,
-      prNumber: null,
-      createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-      updatedAt: new Date()
-    },
-    {
-      id: 2,
-      issue: {
-        id: 3,
-        title: "Fix memory leak in Go-Ethereum",
-        url: "https://github.com/ethereum/go-ethereum/issues/3",
-        reward: 500
-      },
-      repository: "ethereum/go-ethereum",
-      status: "approved",
-      prUrl: "https://github.com/ethereum/go-ethereum/pull/103",
-      prNumber: 103,
-      transactionHash: "0x" + Math.random().toString(16).substr(2, 64),
-      createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
-      updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
-    },
-    {
-      id: 3,
-      issue: {
-        id: 5,
-        title: "Implement CI/CD pipeline for Base contracts",
-        url: "https://github.com/base-org/contracts/issues/5",
-        reward: 300
-      },
-      repository: "base-org/contracts",
-      status: "review",
-      prUrl: "https://github.com/base-org/contracts/pull/105",
-      prNumber: 105,
-      createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-      updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)
-    },
-    {
-      id: 4,
-      issue: {
-        id: 5,
-        title: "Fix TypeError in CodeCrew App",
-        url: "https://github.com/UJWALGUPTA/code-crew-app/issues/3",
-        reward: 500
-      },
-      repository: "UJWALGUPTA/code-crew-app",
-      status: "submitted",
-      prUrl: "https://github.com/UJWALGUPTA/code-crew-app/pull/103",
-      prNumber: 103,
-      createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-      updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)
-    }
-  ];
 
-  // Use sample claims for the demo
-  const { data: claims = sampleClaims, isLoading = false } = useQuery({
+  const { data: claims = [], isLoading } = useQuery({
     queryKey: ["/api/claims"],
-    enabled: false, // Disable actual API request for demo
+    enabled: isAuthenticated,
   });
 
   const filteredClaims = claims.filter((claim: any) => 

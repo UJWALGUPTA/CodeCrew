@@ -23,88 +23,14 @@ export default function BrowseIssues() {
   const [labelFilters, setLabelFilters] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState("all");
 
-  // Demo data for issues
-  const sampleIssues = [
-    {
-      id: 1,
-      title: "Fix documentation for React",
-      description: "The installation guide has several outdated steps that need to be updated for the latest version.",
-      repository: "facebook/react",
-      url: "https://github.com/facebook/react/issues/1",
-      reward: 100,
-      type: "docs",
-      labels: ["documentation", "good first issue"],
-      createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-      updatedAt: new Date()
-    },
-    {
-      id: 2,
-      title: "Add dark mode to the React UI",
-      description: "The app should respect the user's system theme preference and offer a toggle for light/dark mode.",
-      repository: "facebook/react",
-      url: "https://github.com/facebook/react/issues/2",
-      reward: 250,
-      type: "enhancement",
-      labels: ["feature", "ui"],
-      createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-      updatedAt: new Date()
-    },
-    {
-      id: 3,
-      title: "Fix memory leak in Go-Ethereum",
-      description: "There's a serious memory leak when processing large data sets that needs to be addressed.",
-      repository: "ethereum/go-ethereum",
-      url: "https://github.com/ethereum/go-ethereum/issues/3",
-      reward: 500,
-      type: "bug",
-      labels: ["bug", "critical"],
-      createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-      updatedAt: new Date()
-    },
-    {
-      id: 4,
-      title: "Implement CI/CD pipeline for Base contracts",
-      description: "Need to set up automated testing and deployment workflows using GitHub Actions.",
-      repository: "base-org/contracts",
-      url: "https://github.com/base-org/contracts/issues/5",
-      reward: 300,
-      type: "enhancement",
-      labels: ["devops", "automation"],
-      createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-      updatedAt: new Date()
-    },
-    {
-      id: 5,
-      title: "Fix TypeError in CodeCrew App",
-      description: "There's a type error occurring in the payments module that needs to be fixed.",
-      repository: "UJWALGUPTA/code-crew-app",
-      url: "https://github.com/UJWALGUPTA/code-crew-app/issues/3",
-      reward: 500,
-      type: "bug",
-      labels: ["bug", "high-priority"],
-      createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-      updatedAt: new Date()
-    }
-  ];
-
-  // Use sample issues for the demo
-  const { data: issues = sampleIssues, isLoading = false } = useQuery({
+  const { data: issues = [], isLoading } = useQuery({
     queryKey: ["/api/issues"],
-    enabled: false, // Disable actual API request for demo
+    enabled: isAuthenticated,
   });
 
-  // Sample popular labels for demo
-  const sampleLabels = [
-    { name: "bug", count: 48 },
-    { name: "feature", count: 37 },
-    { name: "enhancement", count: 26 },
-    { name: "documentation", count: 19 },
-    { name: "good first issue", count: 14 }
-  ];
-
-  const { data: popularLabels = sampleLabels } = useQuery({
+  const { data: popularLabels = [] } = useQuery({
     queryKey: ["/api/labels/popular"],
-    enabled: false, // Disable actual API request for demo
+    enabled: isAuthenticated,
   });
 
   const filteredIssues = issues.filter((issue: any) => {
@@ -199,21 +125,21 @@ export default function BrowseIssues() {
             <CardContent className="p-6">
               <h3 className="font-medium mb-4">Popular Labels</h3>
               <div className="space-y-2">
-                {popularLabels.map((labelObj: any) => (
-                  <div key={labelObj.name} className="flex items-center space-x-2">
+                {popularLabels.map((label: string) => (
+                  <div key={label} className="flex items-center space-x-2">
                     <Checkbox 
-                      id={`label-${labelObj.name}`}
-                      checked={labelFilters.includes(labelObj.name)}
+                      id={`label-${label}`}
+                      checked={labelFilters.includes(label)}
                       onCheckedChange={(checked) => {
                         if (checked) {
-                          setLabelFilters([...labelFilters, labelObj.name]);
+                          setLabelFilters([...labelFilters, label]);
                         } else {
-                          setLabelFilters(labelFilters.filter(l => l !== labelObj.name));
+                          setLabelFilters(labelFilters.filter(l => l !== label));
                         }
                       }}
                     />
-                    <Label htmlFor={`label-${labelObj.name}`} className="text-sm cursor-pointer">
-                      {labelObj.name} <span className="text-muted-foreground ml-1">({labelObj.count})</span>
+                    <Label htmlFor={`label-${label}`} className="text-sm cursor-pointer">
+                      {label}
                     </Label>
                   </div>
                 ))}

@@ -22,80 +22,16 @@ export default function History() {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("all");
 
-  // Sample history data for the demo
-  const sampleHistory = [
-    {
-      id: 1,
-      type: "claim",
-      status: "completed",
-      date: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000),
-      issue: {
-        id: 3,
-        title: "Fix memory leak in Go-Ethereum",
-        url: "https://github.com/ethereum/go-ethereum/issues/3"
-      },
-      repository: "ethereum/go-ethereum",
-      reward: 500,
-      transactionHash: "0x" + Math.random().toString(16).substr(2, 64)
-    },
-    {
-      id: 2,
-      type: "claim",
-      status: "completed",
-      date: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000),
-      issue: {
-        id: 5,
-        title: "Add TypeScript definitions",
-        url: "https://github.com/base-org/contracts/issues/4"
-      },
-      repository: "base-org/contracts",
-      reward: 200,
-      transactionHash: "0x" + Math.random().toString(16).substr(2, 64)
-    },
-    {
-      id: 3,
-      type: "claim",
-      status: "rejected",
-      date: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000),
-      issue: {
-        id: 7,
-        title: "Optimize database queries",
-        url: "https://github.com/facebook/react/issues/7"
-      },
-      repository: "facebook/react",
-      reward: 300,
-      reason: "Pull request didn't address the core performance issues"
-    },
-    {
-      id: 4,
-      type: "deposit",
-      status: "completed",
-      date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-      repository: "UJWALGUPTA/code-crew-app",
-      amount: 1000,
-      transactionHash: "0x" + Math.random().toString(16).substr(2, 64)
-    },
-    {
-      id: 5,
-      type: "withdrawal",
-      status: "completed",
-      date: new Date(Date.now() - 35 * 24 * 60 * 60 * 1000),
-      amount: 200,
-      transactionHash: "0x" + Math.random().toString(16).substr(2, 64)
-    }
-  ];
-
-  // Use sample history for the demo
-  const { data: history = sampleHistory, isLoading = false } = useQuery({
+  const { data: history = [], isLoading } = useQuery({
     queryKey: ["/api/history"],
-    enabled: false, // Disable actual API request for demo
+    enabled: isAuthenticated,
   });
 
   const filteredHistory = history.filter((item: any) => {
     // Filter by search term
     const matchesSearch = searchTerm === "" || 
-      (item.issue && item.issue.title && item.issue.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (item.repository && item.repository.toLowerCase().includes(searchTerm.toLowerCase()));
+      item.issue.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.repository.toLowerCase().includes(searchTerm.toLowerCase());
     
     // Filter by tab
     const matchesTab = activeTab === "all" || activeTab === item.status;
@@ -175,42 +111,25 @@ export default function History() {
                       <TableRow key={item.id}>
                         <TableCell>
                           <div>
-                            <div className="font-medium">{item.repository || "System"}</div>
-                            <div className="text-sm text-muted-foreground">
-                              {item.issue && item.issue.title ? item.issue.title : 
-                               item.type === "deposit" ? `Deposit to repository` :
-                               item.type === "withdrawal" ? "Withdrawal" : "Transaction"}
-                            </div>
+                            <div className="font-medium">{item.repository}</div>
+                            <div className="text-sm text-muted-foreground">{item.issue.title}</div>
                           </div>
                         </TableCell>
                         <TableCell>
-                          {item.date ? format(new Date(item.date), 'MMM d, yyyy') : format(new Date(), 'MMM d, yyyy')}
+                          {format(new Date(item.completedAt || item.updatedAt), 'MMM d, yyyy')}
                         </TableCell>
                         <TableCell>
                           <div className={`font-mono ${item.status === 'completed' ? 'neon-primary text-primary' : 'text-muted-foreground'}`}>
-                            {item.status === 'completed' ? 
-                              (item.reward ? `+${item.reward}` : 
-                               item.amount ? (item.type === 'deposit' ? `-${item.amount}` : `+${item.amount}`) : "0") 
-                              : 
-                              (item.reward || item.amount || "0")} TOKENS
+                            {item.status === 'completed' ? `+${item.issue.reward}` : item.issue.reward} TOKENS
                           </div>
                         </TableCell>
                         <TableCell>
                           {renderStatusBadge(item.status)}
                         </TableCell>
                         <TableCell className="text-right">
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            onClick={() => {
-                              const url = item.transactionUrl || 
-                                    (item.transactionHash ? `https://sepolia-explorer.base.org/tx/${item.transactionHash}` : 
-                                    (item.issue && item.issue.url ? item.issue.url : '#'));
-                              if (url !== '#') window.open(url, '_blank');
-                            }}
-                          >
+                          <Button variant="outline" size="sm" onClick={() => window.open(item.transactionUrl || item.issue.url, '_blank')}>
                             <ExternalLink className="w-4 h-4 mr-1" />
-                            {item.transactionHash || item.transactionUrl ? 'View TX' : 'View Issue'}
+                            {item.status === 'completed' ? 'View TX' : 'View Issue'}
                           </Button>
                         </TableCell>
                       </TableRow>
