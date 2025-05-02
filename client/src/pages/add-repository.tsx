@@ -269,9 +269,36 @@ export default function AddRepository() {
       });
       return;
     }
-
+    
+    // Extract owner and repo from URL
+    const url = new URL(values.repositoryUrl);
+    const pathParts = url.pathname.split('/').filter(Boolean);
+    const owner = pathParts[0];
+    const repo = pathParts[1];
+    
+    if (!owner || !repo) {
+      toast({
+        title: "Invalid repository URL",
+        description: "Please select a valid GitHub repository",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Check if GitHub App is installed for this repository
     setIsAdding(true);
     try {
+      const isInstalled = await checkAppInstallation(owner, repo);
+      
+      if (!isInstalled) {
+        toast({
+          title: "GitHub App Not Installed",
+          description: "Please install the GitHub App on this repository before adding it",
+          variant: "destructive",
+        });
+        return;
+      }
+      
       await addRepositoryMutation.mutateAsync(values);
     } finally {
       setIsAdding(false);
@@ -312,17 +339,22 @@ export default function AddRepository() {
           {isGithubConnected && (
             <Alert className="mb-6">
               <Github className="h-4 w-4" />
-              <AlertTitle>Important: Install CodeCrew App on Your Repositories</AlertTitle>
+              <AlertTitle>Important: Install GitHub App on Your Repositories</AlertTitle>
               <AlertDescription>
                 <p className="mb-2">
-                  Before adding a repository, please install the CodeCrew GitHub App on your specific repositories. 
+                  Before adding a repository, please install the GitHub App on your specific repositories. 
                   This is required to track issues, pull requests, and manage bounties properly.
                 </p>
                 <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
                   <Button 
                     variant="default" 
                     size="sm"
-                    onClick={() => window.open("https://github.com/apps/codecrewai", "_blank")}
+                    onClick={() => {
+                      if (githubAppDetails) {
+                        window.open(githubAppDetails.installUrl, "_blank");
+                      }
+                    }}
+                    disabled={!githubAppDetails}
                   >
                     <Github className="mr-2 h-4 w-4" />
                     Install App on Repositories
@@ -330,7 +362,12 @@ export default function AddRepository() {
                   <Button 
                     variant="outline" 
                     size="sm"
-                    onClick={() => window.open("https://github.com/apps/codecrewai/installations/new", "_blank")}
+                    onClick={() => {
+                      if (githubAppDetails) {
+                        window.open(githubAppDetails.configUrl, "_blank");
+                      }
+                    }}
+                    disabled={!githubAppDetails}
                   >
                     <span className="mr-2">⚙️</span>
                     Configure App Settings
@@ -422,6 +459,10 @@ export default function AddRepository() {
                                 <GitFork className="h-3.5 w-3.5 mr-1" />
                                 {repo.forks || 0}
                               </div>
+                              <div className="flex items-center">
+                                <span className="mr-1">🔍</span>
+                                {repo.openIssues || 0} issues
+                              </div>
                             </div>
                           </div>
                         </CardContent>
@@ -464,6 +505,10 @@ export default function AddRepository() {
                               <GitFork className="h-3 w-3 mr-1" />
                               {selectedRepository.forks || 0}
                             </div>
+                            <div className="flex items-center">
+                              <span className="mr-1">🔍</span>
+                              {selectedRepository.openIssues || 0} issues
+                            </div>
                           </div>
                         </div>
                         <Button 
@@ -475,10 +520,11 @@ export default function AddRepository() {
                             e.stopPropagation();
                             // Use the proper url for repository-level installation
                             const [owner, repo] = selectedRepository.fullName.split('/');
-                            if (owner && repo) {
-                              window.open(`https://github.com/apps/codecrewai/installations/new/permissions?target_id=${owner}`, "_blank");
+                            if (owner && repo && githubAppDetails) {
+                              window.open(githubAppDetails.repoInstallUrl(owner), "_blank");
                             }
                           }}
+                          disabled={!githubAppDetails}
                         >
                           <Github className="mr-2 h-3 w-3" />
                           Install GitHub App on This Repository
