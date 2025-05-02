@@ -188,13 +188,13 @@ export default function AddRepository() {
       console.log("Repository created:", repository);
       return repository;
     },
-    onSuccess: () => {
+    onSuccess: (repository) => {
       queryClient.invalidateQueries({ queryKey: ["/api/repositories"] });
       toast({
         title: "Repository added",
         description: "The repository has been added successfully. You can now fund it and assign bounties to issues.",
       });
-      navigate("/");
+      navigate(`/repository-detail/${repository.id}`);
     },
     onError: (error) => {
       toast({

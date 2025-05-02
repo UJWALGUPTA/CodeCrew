@@ -270,7 +270,7 @@ export default function RepositoryDetail() {
                   <Calendar className="mr-2 h-4 w-4" />
                   Last Updated
                 </div>
-                <span>{formatDistanceToNow(new Date(repository.updatedAt), { addSuffix: true })}</span>
+                <span>{repository.updatedAt ? formatDistanceToNow(new Date(repository.updatedAt), { addSuffix: true }) : 'Unknown'}</span>
               </div>
               <div className="flex justify-between">
                 <div className="flex items-center text-muted-foreground">
@@ -370,7 +370,7 @@ export default function RepositoryDetail() {
                           <div className="flex items-center mt-1 text-sm text-muted-foreground">
                             <span>#{issue.number}</span>
                             <span className="mx-2">•</span>
-                            <span>Opened {formatDistanceToNow(new Date(issue.createdAt), { addSuffix: true })}</span>
+                            <span>Opened {issue.createdAt ? formatDistanceToNow(new Date(issue.createdAt), { addSuffix: true }) : 'recently'}</span>
                           </div>
                         </div>
                         
@@ -425,7 +425,7 @@ export default function RepositoryDetail() {
                           <div className="flex items-center mt-1 text-sm text-muted-foreground">
                             <span>#{issue.number}</span>
                             <span className="mx-2">•</span>
-                            <span>Bounty added {formatDistanceToNow(new Date(issue.bountyAddedAt), { addSuffix: true })}</span>
+                            <span>Bounty added {issue.bountyAddedAt ? formatDistanceToNow(new Date(issue.bountyAddedAt), { addSuffix: true }) : 'recently'}</span>
                           </div>
                         </div>
                         

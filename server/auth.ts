@@ -113,8 +113,8 @@ export const handleGithubCallback = async (req: Request, res: Response) => {
       req.session.userId = user.id;
     }
 
-    // Redirect to client app
-    res.redirect("/");
+    // Redirect to dashboard
+    res.redirect("/dashboard");
   } catch (error) {
     console.error("GitHub OAuth error:", error);
     res.status(500).json({ message: "Authentication failed" });
