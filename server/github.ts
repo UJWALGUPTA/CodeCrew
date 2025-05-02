@@ -181,7 +181,8 @@ class GitHubClient {
     try {
       console.log("Fetching repositories from GitHub API with token:", accessToken ? "token-exists" : "no-token");
       
-      const response = await fetch("https://api.github.com/user/repos?sort=updated&per_page=100", {
+      // Modified to only fetch public repositories
+      const response = await fetch("https://api.github.com/user/repos?sort=updated&per_page=100&visibility=public", {
         headers: {
           Authorization: `token ${accessToken}`,
           Accept: "application/vnd.github.v3+json"
