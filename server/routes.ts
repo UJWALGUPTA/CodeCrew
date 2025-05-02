@@ -421,7 +421,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/repositories/:id/issues", isAuthenticated, async (req: Request, res: Response) => {
     try {
       const repoId = parseInt(req.params.id);
-      const issues = await storage.listIssues({ repositoryId: repoId });
+      let issues = await storage.listIssues({ repositoryId: repoId });
+      
+      // If no issues in database, try fetching from GitHub
+      if (issues.length === 0) {
+        const repository = await storage.getRepository(repoId);
+        
+        if (repository) {
+          console.log(`No issues found in DB for repo ${repository.fullName}, fetching from GitHub`);
+          
+          // Get issues from GitHub
+          try {
+            const githubIssues = await githubClient.fetchRepoIssuesFromGithub(
+              repository.owner, 
+              repository.name
+            );
+            
+            // Convert GitHub issues to our format
+            issues = githubIssues.map((ghIssue: any) => ({
+              id: ghIssue.id.toString(),
+              repositoryId: repoId,
+              number: ghIssue.number,
+              title: ghIssue.title,
+              description: ghIssue.body,
+              state: ghIssue.state,
+              url: ghIssue.html_url,
+              createdAt: ghIssue.created_at,
+              updatedAt: ghIssue.updated_at,
+              hasBounty: false,
+              reward: 0,
+              type: "feature"
+            }));
+            
+            console.log(`Fetched ${issues.length} issues from GitHub for ${repository.fullName}`);
+          } catch (ghError) {
+            console.error(`Error fetching GitHub issues: ${ghError}`);
+          }
+        }
+      }
+      
       res.json(issues);
     } catch (error) {
       console.error(`Error fetching issues for repository ${req.params.id}:`, error);

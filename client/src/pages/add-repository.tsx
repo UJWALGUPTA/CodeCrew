@@ -143,8 +143,11 @@ export default function AddRepository() {
         console.log(`Received ${data.length} repositories from GitHub API:`, data);
         
         // Filter out repositories that have already been added to the platform
-        const existingRepoNames = existingRepos.map((repo: any) => repo.fullName);
-        return data.filter((repo: Repository) => !existingRepoNames.includes(repo.fullName));
+        const existingRepoNames = existingRepos.map((repo: any) => repo.fullName?.toLowerCase());
+        console.log("Existing repos to filter out:", existingRepoNames);
+        const filteredRepos = data.filter((repo: Repository) => !existingRepoNames.includes(repo.fullName?.toLowerCase()));
+        console.log(`Filtered from ${data.length} to ${filteredRepos.length} repositories`);
+        return filteredRepos;
       } catch (error) {
         console.error("Error fetching repositories:", error);
         throw error;
