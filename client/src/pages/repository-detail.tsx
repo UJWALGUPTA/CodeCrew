@@ -58,22 +58,22 @@ export default function RepositoryDetail() {
   const [bountyAmount, setBountyAmount] = useState("50");
   const [isBountyDialogOpen, setIsBountyDialogOpen] = useState(false);
 
-  const { data: repository, isLoading } = useQuery({
+  const { data: repository = {}, isLoading } = useQuery<any>({
     queryKey: [`/api/repositories/${id}`],
     enabled: isAuthenticated && id !== undefined,
   });
 
-  const { data: poolStats } = useQuery({
+  const { data: poolStats = {} } = useQuery<any>({
     queryKey: [`/api/repositories/${id}/pool`],
     enabled: isAuthenticated && id !== undefined,
   });
 
-  const { data: issues } = useQuery({
+  const { data: issues = [] } = useQuery<any[]>({
     queryKey: [`/api/repositories/${id}/issues`],
     enabled: isAuthenticated && id !== undefined,
   });
 
-  const { data: isOwner } = useQuery({
+  const { data: isOwner = false } = useQuery<boolean>({
     queryKey: [`/api/repositories/${id}/is-owner`],
     enabled: isAuthenticated && id !== undefined,
   });
