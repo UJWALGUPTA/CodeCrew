@@ -520,8 +520,9 @@ export default function AddRepository() {
                             e.stopPropagation();
                             // Use the proper url for repository-level installation
                             const [owner, repo] = selectedRepository.fullName.split('/');
-                            if (owner && repo && githubAppDetails) {
-                              window.open(githubAppDetails.repoInstallUrl(owner), "_blank");
+                            if (owner && repo && githubAppDetails && githubAppDetails.repoInstallUrlTemplate) {
+                              const installUrl = githubAppDetails.repoInstallUrlTemplate.replace('{owner}', owner);
+                              window.open(installUrl, "_blank");
                             }
                           }}
                           disabled={!githubAppDetails}

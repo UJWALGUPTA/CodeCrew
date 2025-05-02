@@ -466,8 +466,7 @@ class GitHubClient {
       name: this.appName,
       installUrl: `https://github.com/apps/${this.appName}/installations/new`,
       configUrl: `https://github.com/apps/${this.appName}/installations/new`,
-      repoInstallUrl: (owner: string) => 
-        `https://github.com/apps/${this.appName}/installations/new/permissions?target_id=${owner}`,
+      repoInstallUrlTemplate: `https://github.com/apps/${this.appName}/installations/new/permissions?target_id={owner}`,
     };
   }
   
