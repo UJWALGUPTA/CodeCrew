@@ -47,7 +47,8 @@ import {
 } from "lucide-react";
 
 export default function RepositoryDetail() {
-  const { id } = useParams();
+  const params = useParams();
+  const id = params.id;
   const { isAuthenticated } = useAuth();
   const { isConnected, balance } = useWallet();
   const { toast } = useToast();

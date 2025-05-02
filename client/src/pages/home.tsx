@@ -26,16 +26,9 @@ export default function Home() {
   }, [isAuthenticated, setLocation]);
 
   // Fetch dashboard data
-  const { data: dashboardData, isLoading } = useQuery({
+  const { data: dashboardData = {}, isLoading } = useQuery<any>({
     queryKey: ["/api/dashboard"],
     enabled: isAuthenticated,
-  });
-  
-  // Fetch user's repositories
-  const { data: userRepositories = [], isLoading: isLoadingRepos } = useQuery({
-    queryKey: ["/api/repositories"],
-    enabled: isAuthenticated,
-    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   if (!isAuthenticated) {
@@ -106,99 +99,27 @@ export default function Home() {
         <WalletCard />
       </div>
       
-      {/* My Repositories Section */}
+      {/* Activity Feed Section */}
       <div className="mt-6">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">My Repositories</h2>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => setLocation("/add-repository")}
-          >
-            <GitHubLogoIcon className="mr-2 h-4 w-4" />
-            Add Repository
-          </Button>
+          <h2 className="text-xl font-bold">Recent Activity</h2>
         </div>
 
-        {isLoadingRepos ? (
-          <div className="grid gap-4 grid-cols-1">
-            <Skeleton className="h-24 w-full" />
-            <Skeleton className="h-24 w-full" />
-            <Skeleton className="h-24 w-full" />
-          </div>
-        ) : userRepositories.length > 0 ? (
-          <div className="grid gap-4 grid-cols-1">
-            {userRepositories.map((repo: any) => (
-              <Card key={repo.id} className="hover:border-primary transition-all bg-slate-900 text-white border-purple-900/20">
-                <CardContent className="p-4">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <div className="font-medium text-lg">{repo.fullName}</div>
-                      <div className="text-sm text-gray-400 mt-1">{repo.description || 'No description'}</div>
-                      
-                      <div className="flex items-center mt-3 space-x-3 text-xs text-gray-400">
-                        {repo.stars !== null && (
-                          <div className="flex items-center">
-                            <Star className="h-3.5 w-3.5 mr-1" />
-                            {repo.stars}
-                          </div>
-                        )}
-                        {repo.forks !== null && (
-                          <div className="flex items-center">
-                            <GitFork className="h-3.5 w-3.5 mr-1" />
-                            {repo.forks}
-                          </div>
-                        )}
-                        {repo.openIssues !== null && (
-                          <Badge variant="outline" className="flex items-center text-xs bg-slate-800">
-                            {repo.openIssues} issues
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                    
-                    <div className="flex gap-2">
-                      <Button 
-                        variant="outline"
-                        size="sm" 
-                        className="h-8 text-xs border-blue-500/30 text-blue-400"
-                        onClick={() => setLocation(`/repository-detail/${repo.id}`)}
-                      >
-                        View Details
-                      </Button>
-                      
-                      <Button 
-                        variant="outline"
-                        size="sm" 
-                        className="h-8 text-xs border-green-500/30 text-green-400"
-                        onClick={() => setLocation(`/repository-detail/${repo.id}?action=fund`)}
-                      >
-                        <DollarSign className="h-3.5 w-3.5 mr-1" />
-                        Fund
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : (
-          <Card className="border-dashed bg-transparent border-purple-900/30">
-            <CardContent className="p-8 flex flex-col items-center justify-center">
-              <div className="text-muted-foreground mb-4 text-center">
-                <GitHubLogoIcon className="h-12 w-12 mb-3 text-purple-500/50 mx-auto" />
-                <p>You haven't added any repositories yet</p>
-              </div>
-              <Button 
-                onClick={() => setLocation("/add-repository")}
-                className="bg-purple-600 hover:bg-purple-700"
-              >
-                <GitHubLogoIcon className="mr-2 h-4 w-4" />
-                Add Your First Repository
-              </Button>
-            </CardContent>
-          </Card>
-        )}
+        <Card>
+          <CardContent className="p-8 flex flex-col items-center justify-center">
+            <div className="text-muted-foreground mb-4 text-center">
+              <GitHubLogoIcon className="h-12 w-12 mb-3 text-purple-500/50 mx-auto" />
+              <p>Your recent activity will appear here</p>
+            </div>
+            <Button 
+              onClick={() => setLocation("/browse-issues")}
+              className="bg-purple-600 hover:bg-purple-700"
+            >
+              <GitHubLogoIcon className="mr-2 h-4 w-4" />
+              Browse Open Issues
+            </Button>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Custom RainbowKit Connection Button */}

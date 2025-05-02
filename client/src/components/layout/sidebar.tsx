@@ -18,7 +18,7 @@ export default function Sidebar() {
   const { isAuthenticated } = useAuth();
   const [isRepositoriesExpanded, setIsRepositoriesExpanded] = useState(true);
 
-  const { data: repositories = [] } = useQuery({
+  const { data: repositories = [] } = useQuery<any[]>({
     queryKey: ["/api/repositories"],
     enabled: isAuthenticated,
   });
@@ -87,19 +87,19 @@ export default function Sidebar() {
               {repositories.map((repo: any) => (
                 <Link 
                   key={repo.id} 
-                  href={`/repository/${repo.id}`}
+                  href={`/repository-detail/${repo.id}`}
                 >
                   <a
                     className={cn(
                       "flex items-center px-3 py-2 text-sm font-medium rounded-md group",
-                      location === `/repository/${repo.id}`
+                      location === `/repository-detail/${repo.id}`
                         ? "bg-primary/20 text-primary"
                         : "text-muted-foreground hover:text-foreground hover:bg-accent/80"
                     )}
                   >
                     <FolderClosed className={cn(
                       "mr-3 h-5 w-5",
-                      location === `/repository/${repo.id}`
+                      location === `/repository-detail/${repo.id}`
                         ? "text-primary"
                         : "text-muted-foreground group-hover:text-foreground"
                     )} />

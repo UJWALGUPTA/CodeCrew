@@ -26,6 +26,13 @@ function Router() {
           </Layout>
         </ProtectedRoute>
       </Route>
+      <Route path="/home">
+        <ProtectedRoute>
+          <Layout>
+            <Home />
+          </Layout>
+        </ProtectedRoute>
+      </Route>
       <Route path="/browse-issues">
         <ProtectedRoute>
           <Layout>
@@ -47,7 +54,7 @@ function Router() {
           </Layout>
         </ProtectedRoute>
       </Route>
-      <Route path="/repository/:id">
+      <Route path="/repository-detail/:id">
         <ProtectedRoute>
           <Layout>
             <RepositoryDetail />
