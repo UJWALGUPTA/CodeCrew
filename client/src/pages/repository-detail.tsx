@@ -2,6 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { useWallet } from "@/hooks/use-wallet";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useAccount } from "wagmi";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useState } from "react";
@@ -50,7 +52,9 @@ export default function RepositoryDetail() {
   const params = useParams();
   const id = params.id;
   const { isAuthenticated } = useAuth();
-  const { isConnected, balance } = useWallet();
+  const { isConnected: isWalletConnected, balance } = useWallet();
+  // Use RainbowKit's connection status
+  const { isConnected } = useAccount();
   const { toast } = useToast();
   const [_, setLocation] = useLocation();
   const [fundAmount, setFundAmount] = useState("100");
