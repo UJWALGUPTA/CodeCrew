@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "wouter";
+import { useParams, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { useWallet } from "@/hooks/use-wallet";
 import { useToast } from "@/hooks/use-toast";
@@ -52,6 +52,7 @@ export default function RepositoryDetail() {
   const { isAuthenticated } = useAuth();
   const { isConnected, balance } = useWallet();
   const { toast } = useToast();
+  const [_, setLocation] = useLocation();
   const [fundAmount, setFundAmount] = useState("100");
   const [isFundDialogOpen, setIsFundDialogOpen] = useState(false);
   const [issueId, setIssueId] = useState<string | null>(null);
@@ -203,7 +204,8 @@ export default function RepositoryDetail() {
     );
   }
 
-  if (!repository) {
+  // Check for various error conditions
+  if (!repository || !Object.keys(repository).length) {
     return (
       <Card>
         <CardContent className="p-8 text-center">
@@ -212,9 +214,15 @@ export default function RepositoryDetail() {
           <p className="text-muted-foreground mb-4">
             The repository you're looking for doesn't exist or you don't have access to it
           </p>
-          <Button onClick={() => window.location.href = "/"}>
-            Go to Dashboard
-          </Button>
+          <div className="space-y-2">
+            <p className="text-xs text-muted-foreground mb-2">
+              Details: Repository ID: {id}, Authentication status: {isAuthenticated ? 'Authenticated' : 'Not authenticated'}
+              {repoError && <div className="text-destructive">Error: {String(repoError)}</div>}
+            </p>
+            <Button onClick={() => setLocation("/")}>
+              Go to Dashboard
+            </Button>
+          </div>
         </CardContent>
       </Card>
     );
@@ -444,7 +452,7 @@ export default function RepositoryDetail() {
                           <Button variant="outline" size="sm" onClick={() => window.open(issue.url, '_blank')}>
                             View
                           </Button>
-                          <Button size="sm" onClick={() => window.location.href = `/browse-issues?id=${issue.id}`}>
+                          <Button size="sm" onClick={() => setLocation(`/browse-issues?id=${issue.id}`)}>
                             Claim
                           </Button>
                         </div>

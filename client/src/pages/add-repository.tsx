@@ -201,10 +201,10 @@ export default function AddRepository() {
       
       // Make sure we have a valid ID before navigating
       if (repository && repository.id) {
-        navigate(`/repository-detail/${repository.id}`);
+        setLocation(`/repository-detail/${repository.id}`);
       } else {
         console.error("Missing repository ID in response:", repository);
-        navigate('/'); // Fallback to home if ID is missing
+        setLocation('/'); // Fallback to home if ID is missing
       }
     },
     onError: (error) => {
