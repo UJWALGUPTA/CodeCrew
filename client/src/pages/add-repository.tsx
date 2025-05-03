@@ -18,7 +18,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useGithub } from "@/hooks/use-github";
 import { useWallet } from "@/hooks/use-wallet";
 import { apiRequest } from "@/lib/queryClient";
-import { AlertCircle, Github, Plus, ExternalLink, RefreshCw, Star, GitFork, CheckCircle, XCircle } from "lucide-react";
+import { AlertCircle, Database, Github, Plus, ExternalLink, RefreshCw, Star, GitFork, CheckCircle, XCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 import { Badge } from "@/components/ui/badge";
@@ -109,16 +109,19 @@ export default function AddRepository() {
   };
   
   // Fetch existing repositories that have already been added to the platform
-  const { data: existingRepos = [] } = useQuery({
+  const { data: existingRepos = [], refetch: refetchExistingRepos } = useQuery({
     queryKey: ["/api/repositories"],
     queryFn: async () => {
+      console.log("Fetching existing repositories");
       const response = await fetch("/api/repositories");
       if (!response.ok) {
         throw new Error("Failed to fetch existing repositories");
       }
-      return response.json();
+      const data = await response.json();
+      console.log("Existing repositories loaded:", data);
+      return data;
     },
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 1, // 1 minute (refresh more frequently)
   });
 
   // Fetch GitHub repositories
@@ -145,8 +148,15 @@ export default function AddRepository() {
         // Filter out repositories that have already been added to the platform
         const existingRepoNames = existingRepos.map((repo: any) => repo.fullName?.toLowerCase());
         console.log("Existing repos to filter out:", existingRepoNames);
-        const filteredRepos = data.filter((repo: Repository) => !existingRepoNames.includes(repo.fullName?.toLowerCase()));
+        
+        // Make sure we're correctly formatting fullName for comparison
+        const filteredRepos = data.filter((repo: Repository) => {
+          const normalizedRepoName = repo.fullName?.toLowerCase();
+          return existingRepoNames.indexOf(normalizedRepoName) === -1;
+        });
+        
         console.log(`Filtered from ${data.length} to ${filteredRepos.length} repositories`);
+        console.log("Filtered repositories:", filteredRepos);
         return filteredRepos;
       } catch (error) {
         console.error("Error fetching repositories:", error);
@@ -191,8 +201,11 @@ export default function AddRepository() {
       console.log("Repository created:", repository);
       return repository;
     },
-    onSuccess: (repository) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/repositories"] });
+    onSuccess: async (repository) => {
+      // Force refresh of the repositories lists
+      await refetchExistingRepos();
+      await refetchRepos();
+      
       toast({
         title: "Repository added",
         description: "The repository has been added successfully. You can now fund it and assign bounties to issues.",
@@ -394,15 +407,29 @@ export default function AddRepository() {
             <div className="space-y-4">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-medium">Your GitHub Repositories</h3>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => refetchRepos()}
-                  disabled={isLoadingRepos}
-                >
-                  <RefreshCw className={`h-4 w-4 mr-2 ${isLoadingRepos ? 'animate-spin' : ''}`} />
-                  Refresh
-                </Button>
+                <div className="flex space-x-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => refetchExistingRepos()}
+                    title="Refresh existing repositories to ensure proper filtering"
+                  >
+                    <Database className="h-4 w-4 mr-2" />
+                    Refresh Added Repos
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => {
+                      refetchExistingRepos();
+                      refetchRepos();
+                    }}
+                    disabled={isLoadingRepos}
+                  >
+                    <RefreshCw className={`h-4 w-4 mr-2 ${isLoadingRepos ? 'animate-spin' : ''}`} />
+                    Refresh All
+                  </Button>
+                </div>
               </div>
 
               <div className="relative mb-4">

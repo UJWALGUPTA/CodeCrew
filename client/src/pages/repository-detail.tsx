@@ -64,6 +64,13 @@ export default function RepositoryDetail() {
   
   const { data: repository = {}, isLoading, error: repoError } = useQuery<any>({
     queryKey: [`/api/repositories/${id}`],
+    queryFn: async () => {
+      const response = await fetch(`/api/repositories/${id}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch repository details: ${response.status} ${response.statusText}`);
+      }
+      return response.json();
+    },
     enabled: isAuthenticated && id !== undefined,
   });
 
@@ -71,6 +78,13 @@ export default function RepositoryDetail() {
 
   const { data: poolStats = {}, error: poolError } = useQuery<any>({
     queryKey: [`/api/repositories/${id}/pool`],
+    queryFn: async () => {
+      const response = await fetch(`/api/repositories/${id}/pool`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch pool stats: ${response.status} ${response.statusText}`);
+      }
+      return response.json();
+    },
     enabled: isAuthenticated && id !== undefined,
   });
 
@@ -78,6 +92,13 @@ export default function RepositoryDetail() {
 
   const { data: issues = [], error: issuesError } = useQuery<any[]>({
     queryKey: [`/api/repositories/${id}/issues`],
+    queryFn: async () => {
+      const response = await fetch(`/api/repositories/${id}/issues`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch repository issues: ${response.status} ${response.statusText}`);
+      }
+      return response.json();
+    },
     enabled: isAuthenticated && id !== undefined,
   });
 
@@ -85,6 +106,13 @@ export default function RepositoryDetail() {
 
   const { data: isOwner = false, error: ownerError } = useQuery<boolean>({
     queryKey: [`/api/repositories/${id}/is-owner`],
+    queryFn: async () => {
+      const response = await fetch(`/api/repositories/${id}/is-owner`);
+      if (!response.ok) {
+        throw new Error(`Failed to check repository ownership: ${response.status} ${response.statusText}`);
+      }
+      return response.json();
+    },
     enabled: isAuthenticated && id !== undefined,
   });
 
