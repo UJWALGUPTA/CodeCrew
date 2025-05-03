@@ -87,22 +87,29 @@ export default function AddRepository() {
       
       const data = await response.json();
       
-      // For development purposes, we'll always return true to make testing easier
-      // In production, this would use the actual value from data.installed
-      setIsAppInstalled(true);
+      // Use the actual value from data.installed
+      const isInstalled = data.installed;
+      setIsAppInstalled(isInstalled);
       setAppInstallUrl(data.installUrl);
       
-      return true;
+      return isInstalled;
     } catch (error) {
       console.error("Error checking GitHub App installation:", error);
       toast({
-        title: "Note",
-        description: "For development purposes, proceeding as if GitHub App is installed",
+        title: "GitHub App Installation Required",
+        description: "Please install the GitHub App on this repository first",
+        variant: "destructive",
       });
       
-      // For development, still allow repository to be added
-      setIsAppInstalled(true);
-      return true;
+      // Set to false and prompt user to install
+      setIsAppInstalled(false);
+      
+      // If we have app details, open the installation URL
+      if (githubAppDetails && githubAppDetails.installUrl) {
+        window.open(githubAppDetails.installUrl, "_blank");
+      }
+      
+      return false;
     } finally {
       setIsCheckingAppInstall(false);
     }
@@ -304,10 +311,29 @@ export default function AddRepository() {
       const isInstalled = await checkAppInstallation(owner, repo);
       
       if (!isInstalled) {
+        // Show toast with clear action
         toast({
           title: "GitHub App Not Installed",
-          description: "Please install the GitHub App on this repository before adding it",
+          description: "You need to install the GitHub App to enable webhooks and track issues",
           variant: "destructive",
+          action: (
+            <div className="mt-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => {
+                  if (githubAppDetails && githubAppDetails.installUrl) {
+                    window.open(githubAppDetails.installUrl, "_blank");
+                  }
+                }}
+                disabled={!githubAppDetails}
+                className="w-full bg-background"
+              >
+                <Github className="mr-2 h-4 w-4" />
+                Install GitHub App
+              </Button>
+            </div>
+          ),
         });
         return;
       }
