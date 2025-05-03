@@ -197,7 +197,15 @@ export default function AddRepository() {
         title: "Repository added",
         description: "The repository has been added successfully. You can now fund it and assign bounties to issues.",
       });
-      navigate(`/repository-detail/${repository.id}`);
+      console.log("Repository from success callback:", repository);
+      
+      // Make sure we have a valid ID before navigating
+      if (repository && repository.id) {
+        navigate(`/repository-detail/${repository.id}`);
+      } else {
+        console.error("Missing repository ID in response:", repository);
+        navigate('/'); // Fallback to home if ID is missing
+      }
     },
     onError: (error) => {
       toast({

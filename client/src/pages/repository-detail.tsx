@@ -58,25 +58,36 @@ export default function RepositoryDetail() {
   const [bountyAmount, setBountyAmount] = useState("50");
   const [isBountyDialogOpen, setIsBountyDialogOpen] = useState(false);
 
-  const { data: repository = {}, isLoading } = useQuery<any>({
+  // Log ID for debugging purposes
+  console.log("Repository detail page ID:", id);
+  
+  const { data: repository = {}, isLoading, error: repoError } = useQuery<any>({
     queryKey: [`/api/repositories/${id}`],
     enabled: isAuthenticated && id !== undefined,
   });
 
-  const { data: poolStats = {} } = useQuery<any>({
+  console.log("Repository data loaded:", repository);
+
+  const { data: poolStats = {}, error: poolError } = useQuery<any>({
     queryKey: [`/api/repositories/${id}/pool`],
     enabled: isAuthenticated && id !== undefined,
   });
 
-  const { data: issues = [] } = useQuery<any[]>({
+  console.log("Pool stats loaded:", poolStats);
+
+  const { data: issues = [], error: issuesError } = useQuery<any[]>({
     queryKey: [`/api/repositories/${id}/issues`],
     enabled: isAuthenticated && id !== undefined,
   });
 
-  const { data: isOwner = false } = useQuery<boolean>({
+  console.log("Issues loaded:", issues);
+
+  const { data: isOwner = false, error: ownerError } = useQuery<boolean>({
     queryKey: [`/api/repositories/${id}/is-owner`],
     enabled: isAuthenticated && id !== undefined,
   });
+
+  console.log("Is owner loaded:", isOwner);
 
   const handleFundRepository = async () => {
     if (!isConnected) {
