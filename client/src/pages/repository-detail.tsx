@@ -375,7 +375,23 @@ export default function RepositoryDetail() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {issues && issues.filter((issue: any) => !issue.hasBounty).length > 0 ? (
+              {issuesError ? (
+                <div className="text-center py-8">
+                  <AlertCircle className="w-12 h-12 mx-auto text-destructive mb-4" />
+                  <h3 className="text-lg font-medium mb-2">Error loading issues</h3>
+                  <p className="text-muted-foreground mb-4">
+                    {String(issuesError)}
+                  </p>
+                </div>
+              ) : issues.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin h-12 w-12 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+                  <h3 className="text-lg font-medium mb-2">Loading issues...</h3>
+                  <p className="text-muted-foreground">
+                    Fetching issues from GitHub
+                  </p>
+                </div>
+              ) : issues.filter((issue: any) => !issue.hasBounty).length > 0 ? (
                 <div className="space-y-4">
                   {issues
                     .filter((issue: any) => !issue.hasBounty)
@@ -427,7 +443,23 @@ export default function RepositoryDetail() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {issues && issues.filter((issue: any) => issue.hasBounty).length > 0 ? (
+              {issuesError ? (
+                <div className="text-center py-8">
+                  <AlertCircle className="w-12 h-12 mx-auto text-destructive mb-4" />
+                  <h3 className="text-lg font-medium mb-2">Error loading issues</h3>
+                  <p className="text-muted-foreground mb-4">
+                    {String(issuesError)}
+                  </p>
+                </div>
+              ) : issues.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin h-12 w-12 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+                  <h3 className="text-lg font-medium mb-2">Loading issues...</h3>
+                  <p className="text-muted-foreground">
+                    Fetching issues from GitHub
+                  </p>
+                </div>
+              ) : issues.filter((issue: any) => issue.hasBounty).length > 0 ? (
                 <div className="space-y-4">
                   {issues
                     .filter((issue: any) => issue.hasBounty)

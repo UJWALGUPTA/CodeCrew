@@ -43,7 +43,7 @@ const formSchema = z.object({
 });
 
 export default function AddRepository() {
-  const [location, navigate] = useLocation();
+  const [_, setLocation] = useLocation();
   const { toast } = useToast();
   const { isAuthenticated } = useAuth();
   const { isConnected: isWalletConnected, connect } = useWallet();
