@@ -546,33 +546,48 @@ export default function RepositoryDetail() {
               Add funds to the repository's reward pool. The daily deposit limit is 1000 TOKENS.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Amount (TOKENS)</span>
-                <span className="text-sm text-muted-foreground">Balance: {balance} TOKENS</span>
+          
+          {!isConnected ? (
+            <div className="py-6 text-center space-y-4">
+              <div className="text-lg font-medium">Connect Wallet</div>
+              <p className="text-muted-foreground mb-4">
+                Please connect your wallet to fund this repository
+              </p>
+              <div className="flex justify-center">
+                <ConnectButton />
               </div>
-              <Input
-                type="number"
-                min="1"
-                max={Math.min(balance, 1000 - (poolStats?.dailyDeposited || 0))}
-                value={fundAmount}
-                onChange={(e) => setFundAmount(e.target.value)}
-                className="font-mono"
-              />
             </div>
-            <div className="text-sm text-muted-foreground">
-              Daily deposit used: {poolStats?.dailyDeposited || 0}/1000 TOKENS
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsFundDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleFundRepository} className="neon-border-primary">
-              Fund Repository
-            </Button>
-          </DialogFooter>
+          ) : (
+            <>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">Amount (TOKENS)</span>
+                    <span className="text-sm text-muted-foreground">Balance: {balance} TOKENS</span>
+                  </div>
+                  <Input
+                    type="number"
+                    min="1"
+                    max={Math.min(balance, 1000 - (poolStats?.dailyDeposited || 0))}
+                    value={fundAmount}
+                    onChange={(e) => setFundAmount(e.target.value)}
+                    className="font-mono"
+                  />
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  Daily deposit used: {poolStats?.dailyDeposited || 0}/1000 TOKENS
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setIsFundDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleFundRepository} className="neon-border-primary">
+                  Fund Repository
+                </Button>
+              </DialogFooter>
+            </>
+          )}
         </DialogContent>
       </Dialog>
 
@@ -585,32 +600,47 @@ export default function RepositoryDetail() {
               Assign a bounty to this issue from the repository's reward pool.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Bounty Amount (TOKENS)</span>
-                <span className="text-sm text-muted-foreground">
-                  Available: {poolStats?.availableBalance || 0} TOKENS
-                </span>
+          
+          {!isConnected ? (
+            <div className="py-6 text-center space-y-4">
+              <div className="text-lg font-medium">Connect Wallet</div>
+              <p className="text-muted-foreground mb-4">
+                Please connect your wallet to set a bounty for this issue
+              </p>
+              <div className="flex justify-center">
+                <ConnectButton />
               </div>
-              <Input
-                type="number"
-                min="1"
-                max={poolStats?.availableBalance || 0}
-                value={bountyAmount}
-                onChange={(e) => setBountyAmount(e.target.value)}
-                className="font-mono"
-              />
             </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsBountyDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleSetBounty} className="neon-border-primary">
-              Set Bounty
-            </Button>
-          </DialogFooter>
+          ) : (
+            <>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">Bounty Amount (TOKENS)</span>
+                    <span className="text-sm text-muted-foreground">
+                      Available: {poolStats?.availableBalance || 0} TOKENS
+                    </span>
+                  </div>
+                  <Input
+                    type="number"
+                    min="1"
+                    max={poolStats?.availableBalance || 0}
+                    value={bountyAmount}
+                    onChange={(e) => setBountyAmount(e.target.value)}
+                    className="font-mono"
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setIsBountyDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleSetBounty} className="neon-border-primary">
+                  Set Bounty
+                </Button>
+              </DialogFooter>
+            </>
+          )}
         </DialogContent>
       </Dialog>
     </div>
