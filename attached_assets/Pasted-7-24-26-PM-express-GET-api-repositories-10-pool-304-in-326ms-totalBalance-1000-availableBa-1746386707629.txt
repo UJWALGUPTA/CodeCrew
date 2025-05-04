@@ -1,0 +1,39 @@
+7:24:26 PM [express] GET /api/repositories/10/pool 304 in 326ms :: {"totalBalance":1000,"availableBa…
+No issues found in DB for repo NexusVoidAi/test, fetching from GitHub
+Fetching issues for NexusVoidAi/test using public API
+JWT error when checking app installation: Error: secretOrPrivateKey must be an asymmetric key when using RS256
+    at module.exports [as sign] (/home/runner/workspace/node_modules/jsonwebtoken/sign.js:130:22)
+    at GitHubClient.generateJWT (/home/runner/workspace/server/github.ts:52:25)
+    at GitHubClient.isAppInstalledForRepo (/home/runner/workspace/server/github.ts:503:26)
+    at GitHubClient.fetchRepoIssuesFromGithub (/home/runner/workspace/server/github.ts:542:40)
+    at <anonymous> (/home/runner/workspace/server/routes.ts:486:53)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+Error using GitHub App, falling back to public API: Error: secretOrPrivateKey must be an asymmetric key when using RS256
+Fetched 1 issues for NexusVoidAi/test using public API
+Fetched 1 issues from GitHub for NexusVoidAi/test
+7:24:27 PM [express] GET /api/repositories/10/issues 304 in 554ms :: [{"id":3036590970,"repositoryId…
+Error setting bounty for issue 3036590970: error: value "3036590970" is out of range for type integer
+    at file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1345:74
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-serverless/session.ts:102:18)
+    at async DatabaseStorage.getIssue (/home/runner/workspace/server/storage.ts:523:21)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:639:21) {
+  length: 153,
+  severity: 'ERROR',
+  code: '22003',
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: "unnamed portal parameter $1 = '...'",
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'numutils.c',
+  line: '611',
+  routine: 'pg_strtoint32_safe'
+}
+7:24:33 PM [express] POST /api/issues/3036590970/set-bounty 500 in 79ms :: {"message":"Failed to set…

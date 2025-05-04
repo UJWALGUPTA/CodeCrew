@@ -481,32 +481,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (repository) {
           console.log(`No issues found in DB for repo ${repository.fullName}, fetching from GitHub`);
           
-          // Get issues from GitHub
           try {
+            // Get issues from GitHub
             const githubIssues = await githubClient.fetchRepoIssuesFromGithub(
               repository.owner, 
               repository.name
             );
             
-            // Convert GitHub issues to our format
-            issues = githubIssues.map((ghIssue: any) => ({
-              id: parseInt(ghIssue.id.toString()),
-              repositoryId: repoId,
-              issueNumber: ghIssue.number,
-              title: ghIssue.title,
-              description: ghIssue.body,
-              state: ghIssue.state,
-              url: ghIssue.html_url,
-              createdAt: new Date(ghIssue.created_at),
-              updatedAt: new Date(ghIssue.updated_at),
-              hasBounty: false,
-              reward: 0,
-              type: "feature",
-              number: ghIssue.number, // For backward compatibility
-              bountyAddedAt: null
-            }));
+            console.log(`Fetched ${githubIssues.length} issues from GitHub`);
             
-            console.log(`Fetched ${issues.length} issues from GitHub for ${repository.fullName}`);
+            // Process each GitHub issue
+            for (const ghIssue of githubIssues) {
+              // Check if issue already exists in our database
+              const existingIssue = await storage.getIssueByRepoAndNumber(repoId, ghIssue.number);
+              
+              if (!existingIssue) {
+                // Create a new issue record
+                await storage.createIssue({
+                  repositoryId: repoId,
+                  issueNumber: ghIssue.number,
+                  title: ghIssue.title || "Untitled Issue",
+                  description: ghIssue.body || "",
+                  state: ghIssue.state || "open",
+                  url: ghIssue.html_url,
+                  hasBounty: false,
+                  reward: 0,
+                  type: "feature"
+                });
+              }
+            }
+            
+            // Fetch the issues again after creating them
+            issues = await storage.listIssues({ repositoryId: repoId });
+            console.log(`Processed ${issues.length} issues for ${repository.fullName}`);
           } catch (ghError) {
             console.error(`Error fetching GitHub issues: ${ghError}`);
           }
