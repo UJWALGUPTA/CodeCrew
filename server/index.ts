@@ -11,14 +11,15 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Set up session middleware
+// Set up session middleware with improved configuration
 app.use(session({
-  secret: "codecrew-secret-key",
-  resave: false,
-  saveUninitialized: false,
+  secret: process.env.SESSION_SECRET || "codecrew-secret-key",
+  resave: true, // Changed to true to ensure session is saved
+  saveUninitialized: true, // Changed to true to create session for all visitors (needed for OAuth)
   cookie: { 
     secure: process.env.NODE_ENV === "production",
-    maxAge: 24 * 60 * 60 * 1000 // 1 day
+    maxAge: 24 * 60 * 60 * 1000, // 1 day
+    sameSite: 'lax' // Allows cookies during redirects from GitHub
   }
 }));
 
