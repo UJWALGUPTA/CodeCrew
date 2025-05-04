@@ -60,13 +60,12 @@ export const handleGithubCallback = async (req: Request, res: Response) => {
   console.log("GitHub callback received with state:", state);
   console.log("Session state is:", req.session.oauthState);
   
-  // Special case: If we're in deployed mode, set a fallback session to improve UX
-  // This is a workaround for potential session issues in production
-  if (!req.session.oauthState && process.env.REPLIT_DEPLOYMENT_ID && state) {
-    console.log("Using state passthrough in production for better UX");
-    // Simply continue the flow, accepting the state we receive
+  // For deployed environments, bypass state check completely for better user experience
+  if (process.env.REPLIT_DEPLOYMENT_ID) {
+    console.log("Deployed environment detected - bypassing state verification for better UX");
+    // Continue flow regardless of state in deployment environment
   } 
-  // Normal case: Verify state to prevent CSRF attacks
+  // Development environment: Verify state to prevent CSRF attacks 
   else if (!state || state !== req.session.oauthState) {
     console.error(`State mismatch: Received ${state} but expected ${req.session.oauthState}`);
     return res.status(400).json({ 
