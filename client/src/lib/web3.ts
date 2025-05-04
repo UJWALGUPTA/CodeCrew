@@ -20,9 +20,9 @@ export const REWARD_TOKEN_ADDRESS = import.meta.env.VITE_REWARD_TOKEN_ADDRESS ||
 export const REWARD_POOL_MANAGER_ADDRESS = import.meta.env.VITE_REWARD_POOL_MANAGER_ADDRESS || "0xa00EF3C52Fbfcbc4226b3520B1eDf56D880f9C69"; // RewardPoolManager
 export const BOUNTY_CONTRACT_ADDRESS = import.meta.env.VITE_BOUNTY_CONTRACT_ADDRESS || "0x6D0C54455a9880cE569814F2Bc2BE3a4F4a12CC7"; // BountyContract
 
-// Base Chain RPC URL and Chain ID
-export const BASE_RPC_URL = import.meta.env.VITE_BASE_RPC_URL || "https://sepolia.base.org";
-export const BASE_CHAIN_ID = import.meta.env.VITE_BASE_CHAIN_ID ? parseInt(import.meta.env.VITE_BASE_CHAIN_ID) : 84532; // Base Sepolia testnet
+// Pharos Testnet RPC URL and Chain ID
+export const BASE_RPC_URL = import.meta.env.VITE_BASE_RPC_URL || "https://testnet.dplabs-internal.com";
+export const BASE_CHAIN_ID = import.meta.env.VITE_BASE_CHAIN_ID ? parseInt(import.meta.env.VITE_BASE_CHAIN_ID) : 688688; // Pharos Testnet
 
 // Interface to represent wallet providers (MetaMask, WalletConnect, etc.)
 export interface WalletProvider {
@@ -39,8 +39,8 @@ export function stringToBytes32(text: string): string {
   return ethers.id(text);
 }
 
-// Check if user has Base Chain configured in their wallet
-export async function checkBaseChainConfig(provider: ethers.BrowserProvider): Promise<boolean> {
+// Check if user has Pharos Testnet configured in their wallet
+export async function checkPharosChainConfig(provider: ethers.BrowserProvider): Promise<boolean> {
   try {
     const { chainId } = await provider.getNetwork();
     return chainId === BigInt(BASE_CHAIN_ID);
@@ -50,26 +50,26 @@ export async function checkBaseChainConfig(provider: ethers.BrowserProvider): Pr
   }
 }
 
-// Function to add Base Chain to MetaMask if not already configured
-export async function addBaseChainToWallet(provider: any): Promise<boolean> {
+// Function to add Pharos Testnet to MetaMask if not already configured
+export async function addPharosChainToWallet(provider: any): Promise<boolean> {
   try {
     await provider.request({
       method: 'wallet_addEthereumChain',
       params: [{
         chainId: `0x${BASE_CHAIN_ID.toString(16)}`,
-        chainName: 'Base Sepolia Testnet',
+        chainName: 'Pharos Testnet',
         nativeCurrency: {
           name: 'ETH',
           symbol: 'ETH',
           decimals: 18
         },
         rpcUrls: [BASE_RPC_URL],
-        blockExplorerUrls: ['https://sepolia-explorer.base.org']
+        blockExplorerUrls: ['https://testnet.dplabs-internal.com/explorer']
       }]
     });
     return true;
   } catch (error) {
-    console.error("Error adding Base Chain to wallet:", error);
+    console.error("Error adding Pharos Testnet to wallet:", error);
     return false;
   }
 }

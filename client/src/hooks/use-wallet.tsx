@@ -4,8 +4,8 @@ import { useToast } from "@/hooks/use-toast";
 import { 
   BASE_CHAIN_ID, 
   getTokenBalance, 
-  checkBaseChainConfig, 
-  addBaseChainToWallet 
+  checkPharosChainConfig, 
+  addPharosChainToWallet 
 } from "@/lib/web3";
 
 interface WalletContextType {
@@ -90,14 +90,14 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       // Only check the chain configuration if specified (only during manual connect)
       if (checkChain) {
         try {
-          // Check if connected to Base chain
-          const isBaseChain = await checkBaseChainConfig(web3Provider);
-          if (!isBaseChain) {
-            const added = await addBaseChainToWallet(window.ethereum);
+          // Check if connected to Pharos Testnet
+          const isPharosChain = await checkPharosChainConfig(web3Provider);
+          if (!isPharosChain) {
+            const added = await addPharosChainToWallet(window.ethereum);
             if (!added) {
               // User may have rejected the chain switch, but we can still try to continue
-              console.warn("User declined to add Base Chain. App may not function correctly.");
-              // Don't throw error here, let users use the app even if not on Base
+              console.warn("User declined to add Pharos Testnet. App may not function correctly.");
+              // Don't throw error here, let users use the app even if not on Pharos Testnet
             }
           }
         } catch (chainError) {
