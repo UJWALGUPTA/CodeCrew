@@ -77,7 +77,7 @@ export default function Login() {
             </div>
           </CardContent>
           <CardFooter className="flex justify-between text-xs text-muted-foreground">
-            <span>Powered by Base Chain</span>
+            <span>Powered by Pharos Testnet</span>
             <a href="#" className="hover:text-primary">Terms & Privacy</a>
           </CardFooter>
         </Card>
