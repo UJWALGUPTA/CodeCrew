@@ -238,7 +238,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const existingRepo = await storage.getRepositoryByFullName(fullName);
       if (existingRepo) {
         console.log("Repository already exists:", existingRepo);
-        return res.status(200).json(existingRepo); // Return existing repo with 200 status
+        return res.status(409).json({
+          message: "Repository already exists",
+          repository: existingRepo
+        }); // Return 409 Conflict
       }
       
       // Get the user
@@ -496,10 +499,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
               const existingIssue = await storage.getIssueByRepoAndNumber(repoId, ghIssue.number);
               
               if (!existingIssue) {
-                // Create a new issue record
+                // Create a new issue record - store GitHub ID as string
                 await storage.createIssue({
                   repositoryId: repoId,
                   issueNumber: ghIssue.number,
+                  githubId: ghIssue.id.toString(), // Store the GitHub issue ID as string
                   title: ghIssue.title || "Untitled Issue",
                   description: ghIssue.body || "",
                   state: ghIssue.state || "open",
@@ -635,15 +639,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/issues/:id/set-bounty", isAuthenticated, async (req: Request, res: Response) => {
     try {
-      const issueId = parseInt(req.params.id);
+      const id = req.params.id;
       const amount = parseInt(req.body.amount);
       
       if (isNaN(amount) || amount <= 0) {
         return res.status(400).json({ message: "Invalid amount" });
       }
       
-      // Check if issue exists
-      const issue = await storage.getIssue(issueId);
+      // Find the issue - could be internal ID or GitHub ID
+      let issue = null;
+      
+      // First try to parse as our internal ID
+      const issueId = parseInt(id);
+      if (!isNaN(issueId)) {
+        issue = await storage.getIssue(issueId);
+      }
+      
+      // If not found, try to find by GitHub ID
+      if (!issue && id.length > 10) {
+        // This might be a GitHub ID, look it up by githubId field
+        const issues = await storage.listIssues();
+        issue = issues.find(i => i.githubId === id);
+      }
       if (!issue) {
         return res.status(404).json({ message: "Issue not found" });
       }
@@ -666,8 +683,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // Update the issue with bounty info
-      const updatedIssue = await storage.updateIssue(issueId, {
+      // Update the issue with bounty info - use the issue's ID, not the input ID
+      const updatedIssue = await storage.updateIssue(issue.id, {
         hasBounty: true,
         reward: amount,
         bountyAddedAt: new Date(),

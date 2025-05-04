@@ -71,6 +71,7 @@ export const issues = pgTable("issues", {
   id: serial("id").primaryKey(),
   repositoryId: integer("repository_id").notNull(),
   issueNumber: integer("issue_number").notNull(),
+  githubId: text("github_id"), // Store GitHub's issue ID as text to handle large numbers
   title: text("title").notNull(),
   description: text("description"),
   url: text("url").notNull(),
