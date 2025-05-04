@@ -153,17 +153,17 @@ export default function AddRepository() {
         console.log(`Received ${data.length} repositories from GitHub API:`, data);
         
         // Filter out repositories that have already been added to the platform
-        // Create a Set for more efficient lookups
-        const existingRepoNamesSet = new Set(
-          existingRepos.map((repo: any) => (repo.fullName || '').toLowerCase().trim())
+        // Create an array for lookups - more compatible than Set for this environment
+        const existingRepoNames = existingRepos.map((repo: any) => 
+          (repo.fullName || '').toLowerCase().trim()
         );
-        console.log("Existing repos to filter out:", [...existingRepoNamesSet]);
+        console.log("Existing repos to filter out:", existingRepoNames);
         
         // Make sure we're correctly formatting fullName for comparison
         const filteredRepos = data.filter((repo: Repository) => {
           const normalizedRepoName = (repo.fullName || '').toLowerCase().trim();
           // Log any matches for debugging
-          if (existingRepoNamesSet.has(normalizedRepoName)) {
+          if (existingRepoNames.includes(normalizedRepoName)) {
             console.log(`Filtering out already added repository: ${repo.fullName}`);
             return false;
           }
@@ -205,25 +205,43 @@ export default function AddRepository() {
       
       const fullName = `${owner}/${repo}`;
       
-      // Create the repository
-      const repository: any = await apiRequest("POST", "/api/repositories", {
-        fullName,
-        name: repo,
-        owner,
-        url: values.repositoryUrl,
-      });
-      
-      console.log("Repository created:", repository);
-      return repository;
+      try {
+        // Create the repository
+        const repository: any = await apiRequest("POST", "/api/repositories", {
+          fullName,
+          name: repo,
+          owner,
+          url: values.repositoryUrl,
+        });
+        
+        console.log("Repository created:", repository);
+        return repository;
+      } catch (error: any) {
+        // Check if this is a 409 Conflict error (repository already exists)
+        if (error.status === 409 && error.data && error.data.repository) {
+          console.log("Repository already exists:", error.data.repository);
+          
+          // Return the existing repository data so we can navigate to it
+          return error.data.repository;
+        }
+        // Re-throw any other errors
+        throw error;
+      }
     },
     onSuccess: async (repository) => {
       // Force refresh of the repositories lists
       await refetchExistingRepos();
       await refetchRepos();
       
+      // Check if repository is from an existing repo or a new one
+      const isExisting = repository.createdAt && 
+        (new Date(repository.createdAt).getTime() < Date.now() - 5000); // If created more than 5 seconds ago
+      
       toast({
-        title: "Repository added",
-        description: "The repository has been added successfully. You can now fund it and assign bounties to issues.",
+        title: isExisting ? "Repository already added" : "Repository added",
+        description: isExisting 
+          ? "This repository is already in your list. Redirecting to repository details." 
+          : "The repository has been added successfully. You can now fund it and assign bounties to issues.",
       });
       console.log("Repository from success callback:", repository);
       
