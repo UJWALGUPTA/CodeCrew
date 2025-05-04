@@ -5,7 +5,7 @@ import { RainbowKitProvider, darkTheme } from "@rainbow-me/rainbowkit";
 import "@rainbow-me/rainbowkit/styles.css";
 import { WagmiConfig } from "wagmi";
 import { http, createConfig } from "wagmi";
-import { base, baseSepolia } from "viem/chains";
+import { Chain } from "viem/chains";
 import { getDefaultConfig } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
@@ -17,6 +17,34 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+// Define the Pharos Testnet chain configuration
+const pharosTestnet: Chain = {
+  id: 688688,
+  name: 'Pharos Testnet',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'Ethereum',
+    symbol: 'ETH',
+  },
+  rpcUrls: {
+    default: {
+      http: ['https://testnet.dplabs-internal.com'],
+      webSocket: ['wss://testnet.dplabs-internal.com'],
+    },
+    public: {
+      http: ['https://testnet.dplabs-internal.com'],
+      webSocket: ['wss://testnet.dplabs-internal.com'],
+    },
+  },
+  blockExplorers: {
+    default: {
+      name: 'Pharos Explorer',
+      url: 'https://testnet.dplabs-internal.com/explorer',
+    },
+  },
+  testnet: true,
+};
 
 // Configure chains & providers for Rainbow Kit - use hardcoded project ID for simplicity
 // In a real-world scenario, this would come from environment variables
@@ -37,10 +65,9 @@ if (!walletConnectProjectId) {
 const config = getDefaultConfig({
   appName: "CodeCrew",
   projectId: walletConnectProjectId,
-  chains: [base, baseSepolia],
+  chains: [pharosTestnet],
   transports: {
-    [base.id]: http(),
-    [baseSepolia.id]: http(),
+    [pharosTestnet.id]: http(),
   },
 });
 

@@ -282,7 +282,7 @@ class GitHubClient {
         id: 4567890123,
         name: "codecrew-bounty-platform",
         full_name: "sample-user/codecrew-bounty-platform",
-        description: "Decentralized GitHub bounty platform built on Base Chain",
+        description: "Decentralized GitHub bounty platform built on Pharos Testnet",
         html_url: "https://github.com/sample-user/codecrew-bounty-platform",
         private: false,
         owner: {

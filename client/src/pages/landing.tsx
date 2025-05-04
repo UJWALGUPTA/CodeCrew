@@ -262,7 +262,7 @@ export default function LandingPage() {
               },
               {
                 name: "defi-protocol/lending",
-                description: "Decentralized lending protocol for Base chain",
+                description: "Decentralized lending protocol for Pharos Testnet",
                 tags: ["defi", "finance"],
                 issues: 28,
                 pool: "500 USDC"
