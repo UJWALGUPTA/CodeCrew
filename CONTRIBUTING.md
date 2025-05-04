@@ -82,6 +82,7 @@ This section guides you through submitting an enhancement suggestion for CodeCre
 When working on smart contracts:
 
 - Always prioritize security
+- Target deployment to Pharos Testnet (Chain ID: 688688)
 - Write comprehensive tests for all contract functionality
 - Document all functions and state variables
 - Follow Solidity best practices

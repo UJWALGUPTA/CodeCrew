@@ -1,6 +1,6 @@
 # CodeCrew - Decentralized GitHub Bounty Platform
 
-CodeCrew is a decentralized bounty platform that connects GitHub repositories with cryptocurrency rewards on the Base chain (Ethereum L2). It enables developers to earn tokens for open-source contributions through a seamless integration of GitHub repositories with smart contracts on the Base Sepolia testnet.
+CodeCrew is a decentralized bounty platform that connects GitHub repositories with cryptocurrency rewards on the Pharos Testnet. It enables developers to earn tokens for open-source contributions through a seamless integration of GitHub repositories with smart contracts on the Pharos Testnet.
 
 ![CodeCrew Logo](generated-icon.png)
 
@@ -9,7 +9,7 @@ CodeCrew is a decentralized bounty platform that connects GitHub repositories wi
 - **GitHub Integration**: Connect your GitHub account and import repositories
 - **Repository Management**: Add, view, and manage your repositories
 - **Bounty System**: Set bounties for specific issues in your repositories
-- **Decentralized Rewards**: Distribute rewards using CREW tokens on Base chain
+- **Decentralized Rewards**: Distribute rewards using CREW tokens on Pharos Testnet
 - **Issue Tracking**: Track open issues and their bounties
 - **Claim Management**: Manage claims on issues and verify completed work
 - **Wallet Integration**: Seamless integration with Ethereum wallets via RainbowKit
@@ -18,7 +18,7 @@ CodeCrew is a decentralized bounty platform that connects GitHub repositories wi
 
 - **Frontend**: React, TypeScript, TailwindCSS, shadcn/ui
 - **Backend**: Express.js, PostgreSQL with Drizzle ORM
-- **Blockchain**: Base Sepolia testnet (Ethereum L2)
+- **Blockchain**: Pharos Testnet (Chain ID: 688688)
 - **Authentication**: GitHub OAuth
 - **Web3 Integration**: RainbowKit, wagmi, ethers.js
 - **State Management**: React Query
@@ -30,7 +30,7 @@ CodeCrew is a decentralized bounty platform that connects GitHub repositories wi
 - Node.js (v18+)
 - PostgreSQL database
 - GitHub OAuth application credentials
-- Base Sepolia testnet RPC URL
+- Pharos Testnet access
 
 ### Environment Setup
 
@@ -51,7 +51,7 @@ GITHUB_APP_PRIVATE_KEY=your_github_app_private_key
 GITHUB_WEBHOOK_SECRET=your_github_webhook_secret
 
 # Web3
-VITE_BASE_RPC_URL=https://sepolia.base.org
+VITE_BASE_RPC_URL=https://testnet.dplabs-internal.com
 WALLETCONNECT_PROJECT_ID=your_walletconnect_project_id
 ```
 
@@ -200,7 +200,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 🙏 Acknowledgements
 
-- [Base](https://base.org/) - Ethereum L2 solution
+- [Pharos Testnet](https://dplabs-internal.com/) - Blockchain platform
 - [GitHub API](https://docs.github.com/en/rest) - GitHub integration
 - [Drizzle ORM](https://github.com/drizzle-team/drizzle-orm) - Database ORM
 - [shadcn/ui](https://ui.shadcn.com/) - UI components

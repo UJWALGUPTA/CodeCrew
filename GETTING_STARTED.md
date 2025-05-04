@@ -16,7 +16,7 @@ You'll also need:
 - A **GitHub account** with administrative access to at least one repository
 - A **GitHub OAuth App** for authentication
 - A **GitHub App** for repository integration
-- An **Ethereum wallet** (MetaMask or any WalletConnect compatible wallet)
+- An **Ethereum wallet** (MetaMask or any WalletConnect compatible wallet) configured for Pharos Testnet (Chain ID: 688688)
 
 ## Step 1: Clone the Repository
 
@@ -74,7 +74,7 @@ GITHUB_APP_PRIVATE_KEY=your_github_app_private_key_contents
 GITHUB_WEBHOOK_SECRET=your_github_webhook_secret
 
 # Web3
-VITE_BASE_RPC_URL=https://sepolia.base.org
+VITE_BASE_RPC_URL=https://testnet.dplabs-internal.com
 WALLETCONNECT_PROJECT_ID=your_walletconnect_project_id
 ```
 
@@ -182,9 +182,9 @@ Open your browser and navigate to [http://localhost:5000](http://localhost:5000)
 
 #### Web3 Connection Issues
 
-- Ensure you're connected to the Base Sepolia testnet in your wallet
-- Verify that your wallet has Base Sepolia ETH for gas fees
-- Check that your `VITE_BASE_RPC_URL` is correct in the `.env` file
+- Ensure you're connected to the Pharos Testnet (Chain ID: 688688) in your wallet
+- Verify that your wallet has Pharos Testnet tokens for gas fees
+- Check that your `VITE_BASE_RPC_URL` is correct in the `.env` file (should be `https://testnet.dplabs-internal.com`)
 
 ### Getting Help
 
