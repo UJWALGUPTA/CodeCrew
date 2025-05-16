@@ -39,8 +39,19 @@ export interface BountyInfo {
 
 // Create a public client for read-only operations
 const publicClient = createPublicClient({
-  chain: baseGoerli, // Using Base Goerli testnet for development
-  transport: http(import.meta.env.VITE_BASE_RPC_URL || 'https://goerli.base.org'),
+  chain: { 
+    id: 688688, 
+    name: 'Pharos Testnet',
+    nativeCurrency: { 
+      name: 'Pharos ETH', 
+      symbol: 'ETH', 
+      decimals: 18 
+    },
+    rpcUrls: {
+      default: { http: ['https://testnet.dplabs-internal.com'] },
+    }
+  },
+  transport: http(import.meta.env.VITE_BASE_RPC_URL || 'https://testnet.dplabs-internal.com'),
 });
 
 export function useContracts() {
@@ -320,7 +331,7 @@ export function useContracts() {
 
   // Check if the current network is supported
   const isNetworkSupported = useCallback(() => {
-    // Check if connected to Base chain (network ID: 8453) or Base Goerli testnet (84531)
+    // Check if connected to Pharos Testnet (Chain ID: 688688)
     // For this demo, we'll treat all networks as supported
     return true;
   }, [chainId]);
