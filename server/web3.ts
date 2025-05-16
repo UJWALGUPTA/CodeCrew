@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 
 // This is a mock Web3 client for the CodeCrew project
-// In a real implementation, this would connect to Base Chain
+// In a real implementation, this would connect to Pharos Testnet
 class Web3Client {
   private rpcUrl: string;
   private provider: ethers.providers.JsonRpcProvider;
@@ -10,7 +10,7 @@ class Web3Client {
   private rewardTokenAddress: string;
 
   constructor() {
-    this.rpcUrl = process.env.BASE_RPC_URL || "https://goerli.base.org";
+    this.rpcUrl = process.env.VITE_BASE_RPC_URL || "https://testnet.dplabs-internal.com";
     this.provider = new ethers.providers.JsonRpcProvider(this.rpcUrl);
     this.rewardPoolManagerAddress = process.env.REWARD_POOL_MANAGER_ADDRESS || "0x0000000000000000000000000000000000000001";
     this.bountyContractAddress = process.env.BOUNTY_CONTRACT_ADDRESS || "0x0000000000000000000000000000000000000002";
