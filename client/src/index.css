@@ -13,45 +13,45 @@
 
 @layer base {
   :root {
-    /* CodeCrew color schema */
-    --background: 222 18% 7%; /* #0D1117 */
-    --foreground: 210 40% 96%; /* #F1F5F9 */
-    --muted: 215 16% 15%; /* #1E2330 */
-    --muted-foreground: 215 20% 65%; /* #94A3B8 */
-    --popover: 215 21% 11%; /* #161B22 */
-    --popover-foreground: 210 40% 96%; /* #F1F5F9 */
-    --card: 215 21% 11%; /* #161B22 */
-    --card-foreground: 210 40% 96%; /* #F1F5F9 */
-    --border: 212 12% 21%; /* #30363D */
-    --input: 215 21% 11%; /* #161B22 */
-    --primary: 217 91% 60%; /* #3B82F6 - Primary Accent blue */
-    --primary-foreground: 210 40% 98%;
-    --secondary: 263 70% 63%; /* #8B5CF6 - Secondary Accent violet */
-    --secondary-foreground: 210 40% 98%;
-    --accent: 152 76% 40%; /* #10B981 - Success green */
-    --accent-foreground: 210 40% 98%;
+    /* Nexus Void color schema */
+    --background: 255 23% 13%; /* #2C023F - Dark Purple (Neutrals) */
+    --foreground: 0 0% 100%; /* #FFFFFF - White (Neutrals) */
+    --muted: 240 10% 14%; /* #1F1F25 - Dark Gray (Neutrals) */
+    --muted-foreground: 228 10% 80%; /* #C5C5D2 - Light Gray (Neutrals) */
+    --popover: 264 16% 18%; /* #312442 - Dark Purple (Shades) */
+    --popover-foreground: 0 0% 100%; /* #FFFFFF - White */
+    --card: 264 16% 18%; /* #312442 - Dark Purple (Shades) */
+    --card-foreground: 0 0% 100%; /* #FFFFFF - White */
+    --border: 262 19% 36%; /* #52476C - Medium Purple (Shades) */
+    --input: 264 16% 18%; /* #312442 - Dark Purple (Shades) */
+    --primary: 273 77% 52%; /* #892BE1 - Primary Purple */
+    --primary-foreground: 0 0% 100%; /* #FFFFFF */
+    --secondary: 39 93% 67%; /* #FABE5C - Gold Accent */
+    --secondary-foreground: 0 0% 100%; /* #FFFFFF */
+    --accent: 354 44% 63%; /* #C97B75 - Pink/Red Accent */
+    --accent-foreground: 0 0% 100%; /* #FFFFFF */
     --destructive: 0 84% 60%; /* #EF4444 */
-    --destructive-foreground: 210 40% 98%;
-    --warning: 35 92% 50%; /* #F59E0B */
-    --ring: 217 91% 60%; /* Primary accent for focus rings */
+    --destructive-foreground: 0 0% 100%; /* #FFFFFF */
+    --warning: 39 93% 67%; /* #FABE5C - Gold */
+    --ring: 273 77% 52%; /* #892BE1 - Primary Purple */
     --radius: 0.5rem;
     
-    /* Chart colors */
-    --chart-1: 217 91% 60%; /* Primary accent blue */
-    --chart-2: 263 70% 63%; /* Secondary accent violet */
-    --chart-3: 152 76% 40%; /* Success green */
-    --chart-4: 35 92% 50%; /* Warning orange */
-    --chart-5: 0 84% 60%; /* Destructive red */
+    /* Chart colors - Nexus Void palette */
+    --chart-1: 273 77% 52%; /* #892BE1 - Primary Purple */
+    --chart-2: 39 93% 67%; /* #FABE5C - Gold Accent */
+    --chart-3: 354 44% 63%; /* #C97B75 - Pink/Red Accent */
+    --chart-4: 265 46% 37%; /* #5F299B - Supporting Purple */
+    --chart-5: 261 28% 25%; /* #341D63 - Dark Purple */
     
-    /* Sidebar colors - matching the new CodeCrew schema */
-    --sidebar-background: 222 18% 7%; /* #0D1117 - Match background */
-    --sidebar-foreground: 210 40% 96%; /* #F1F5F9 - Match foreground */
-    --sidebar-primary: 217 91% 60%; /* #3B82F6 - Primary blue */
-    --sidebar-primary-foreground: 210 40% 98%;
-    --sidebar-accent: 215 21% 11%; /* #161B22 - Match surface/card */
-    --sidebar-accent-foreground: 210 40% 96%; /* #F1F5F9 */
-    --sidebar-border: 212 12% 21%; /* #30363D - Match border */
-    --sidebar-ring: 217 91% 60%; /* Primary accent */
+    /* Sidebar colors - matching the Nexus Void schema */
+    --sidebar-background: 255 23% 13%; /* #2C023F - Dark Purple */
+    --sidebar-foreground: 0 0% 100%; /* #FFFFFF - White */
+    --sidebar-primary: 273 77% 52%; /* #892BE1 - Primary Purple */
+    --sidebar-primary-foreground: 0 0% 100%; /* #FFFFFF */
+    --sidebar-accent: 264 16% 18%; /* #312442 - Dark Purple */
+    --sidebar-accent-foreground: 0 0% 100%; /* #FFFFFF */
+    --sidebar-border: 262 19% 36%; /* #52476C - Medium Purple */
+    --sidebar-ring: 273 77% 52%; /* #892BE1 - Primary Purple */
   }
 }
 
@@ -61,7 +61,13 @@
   }
   
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Space Grotesk', sans-serif;
+  }
+  
+  h1, h2, h3, .heading-font {
+    font-family: 'Xirod', sans-serif;
+    letter-spacing: 0.05em;
   }
   
   .code-font {
@@ -84,31 +90,40 @@
     box-shadow: 0 0 5px hsl(var(--secondary)), 0 0 10px hsl(var(--secondary));
   }
 
+  /* Xirod - Primary Font */
   @font-face {
-    font-family: 'Inter';
+    font-family: 'Xirod';
     font-style: normal;
     font-weight: 400;
-    src: url('https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap');
+    src: url('https://fontsfree.net//wp-content/fonts/basic/sans-serif/FontsFree-Net-xirod.ttf') format('truetype');
   }
-
+  
+  /* Space Grotesk - Secondary Font */
   @font-face {
-    font-family: 'Inter';
+    font-family: 'Space Grotesk';
+    font-style: normal;
+    font-weight: 400;
+    src: url('https://fonts.googleapis.com/css2?family=Space+Grotesk&display=swap');
+  }
+  
+  @font-face {
+    font-family: 'Space Grotesk';
     font-style: normal;
     font-weight: 500;
-    src: url('https://fonts.googleapis.com/css2?family=Inter:wght@500&display=swap');
+    src: url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500&display=swap');
   }
-
+  
   @font-face {
-    font-family: 'Inter';
+    font-family: 'Space Grotesk';
     font-style: normal;
     font-weight: 600;
-    src: url('https://fonts.googleapis.com/css2?family=Inter:wght@600&display=swap');
+    src: url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600&display=swap');
   }
-
+  
   @font-face {
-    font-family: 'Inter';
+    font-family: 'Space Grotesk';
     font-style: normal;
     font-weight: 700;
-    src: url('https://fonts.googleapis.com/css2?family=Inter:wght@700&display=swap');
+    src: url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&display=swap');
   }
 }

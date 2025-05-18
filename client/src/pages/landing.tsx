@@ -1,45 +1,112 @@
-import React from "react";
+import React, { useState } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { 
   ArrowRight, Code, Bug, PenTool, FileText, 
   Zap, Server, Github, CheckCircle, ArrowUpRight,
-  ExternalLink, ChevronRight, Wallet
+  ExternalLink, ChevronRight, Wallet, Star, Award
 } from "lucide-react";
 
 export default function LandingPage() {
   const [, navigate] = useLocation();
+  const [githubUsername, setGithubUsername] = useState('');
+  const [userScore, setUserScore] = useState<number | null>(null);
+  const [showScoreResult, setShowScoreResult] = useState(false);
+  
+  // Function to calculate user score based on GitHub username
+  const calculateScore = () => {
+    if (!githubUsername) return;
+    
+    // This would typically call an API to get real score data
+    // For demo purposes, we'll generate a random score between 400-850
+    const randomScore = Math.floor(Math.random() * 450) + 400;
+    setUserScore(randomScore);
+    setShowScoreResult(true);
+  };
   
   return (
-    <div className="flex flex-col min-h-screen bg-[#0D1117]">
+    <div className="flex flex-col min-h-screen bg-background">
       {/* Navigation Bar */}
-      <header className="sticky top-0 z-50 backdrop-blur-sm bg-[#0D1117]/95 border-b border-border">
+      <header className="sticky top-0 z-50 backdrop-blur-sm bg-background/95 border-b border-border">
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
           <div className="flex items-center space-x-2">
-            <svg className="w-8 h-8 text-primary" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 4.5c4.142 0 7.5 3.358 7.5 7.5 0 2.786-1.917 5.223-4.667 5.943v-3.943h1.917v-2h-1.917v-1.5c0-0.942 0.442-1.5 1.5-1.5h0.5v-2h-0.583c-1.978 0-3.23 1.305-3.23 3.25v1.75h-2.12v2h2.12v3.938c-2.737-0.729-4.642-3.161-4.642-5.938 0-4.142 3.358-7.5 7.5-7.5z"/>
+            <svg className="w-10 h-10 text-primary" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 4c4.418 0 8 3.582 8 8 0 4.418-3.582 8-8 8-4.418 0-8-3.582-8-8 0-4.418 3.582-8 8-8zm1 3H9v2h4v3h-3v2h3v3h2v-3h3v-2h-3V9z"/>
             </svg>
-            <span className="text-xl font-bold text-white">CodeCrew</span>
+            <span className="text-xl heading-font text-white">NEXUS<span className="text-secondary">VOID</span></span>
           </div>
           
           <div className="hidden md:flex items-center space-x-6">
-            <a href="#" className="text-gray-300 hover:text-white transition-colors">Home</a>
-            <a href="#browse" className="text-gray-300 hover:text-white transition-colors">Browse Projects</a>
-            <a href="#how-it-works" className="text-gray-300 hover:text-white transition-colors">How It Works</a>
-            <a href="#about" className="text-gray-300 hover:text-white transition-colors">About</a>
+            <a href="#" className="text-muted-foreground hover:text-white transition-colors">Home</a>
+            <a href="#browse" className="text-muted-foreground hover:text-white transition-colors">Projects</a>
+            <a href="#how-it-works" className="text-muted-foreground hover:text-white transition-colors">How It Works</a>
+            <a href="#about" className="text-muted-foreground hover:text-white transition-colors">About</a>
           </div>
           
           <div className="flex items-center space-x-4">
-            <Button 
-              variant="ghost" 
-              size="icon"
-              className="text-gray-300"
-            >
-              {/* Theme toggle (moon/sun) */}
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-            </Button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  className="border-secondary text-secondary hover:bg-secondary/10 font-medium"
+                >
+                  Get Your Score <Star className="ml-2 w-4 h-4" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="bg-card border-border">
+                <DialogHeader>
+                  <DialogTitle className="heading-font text-center text-xl mb-4">DEVELOPER SCORE</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  {!showScoreResult ? (
+                    <>
+                      <p className="text-center text-white mb-4">
+                        Enter your GitHub username to calculate your developer score
+                      </p>
+                      <div className="flex space-x-2">
+                        <Input
+                          value={githubUsername}
+                          onChange={(e) => setGithubUsername(e.target.value)}
+                          placeholder="GitHub Username"
+                          className="bg-muted text-white border-border"
+                        />
+                        <Button 
+                          onClick={calculateScore} 
+                          className="bg-primary hover:bg-primary/90 text-white"
+                        >
+                          Calculate
+                        </Button>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-center py-6">
+                      <div className="w-32 h-32 mx-auto rounded-full flex items-center justify-center border-4 border-primary bg-muted mb-4">
+                        <span className="text-3xl font-bold text-white">{userScore}</span>
+                      </div>
+                      <h3 className="text-xl font-bold text-white mb-2">
+                        {userScore && userScore > 700 ? 'Excellent' : 
+                         userScore && userScore > 600 ? 'Good' : 
+                         userScore && userScore > 500 ? 'Average' : 'Needs Improvement'}
+                      </h3>
+                      <p className="text-muted-foreground">
+                        Based on your GitHub contributions, code quality, and project history
+                      </p>
+                      <Button 
+                        onClick={() => setShowScoreResult(false)} 
+                        className="mt-4 bg-primary hover:bg-primary/90 text-white"
+                      >
+                        Check Another
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </DialogContent>
+            </Dialog>
+            
             <Button 
               onClick={() => navigate("/login")}
               className="bg-primary hover:bg-primary/90 text-white"
