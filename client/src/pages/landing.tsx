@@ -460,9 +460,10 @@ export default function LandingPage() {
                   
                   <Button 
                     variant="outline" 
-                    className="w-full mt-5 border-gray-700 text-gray-300 hover:bg-gray-800"
+                    className={`w-full mt-4 border-primary/30 text-primary hover:bg-primary/10`}
                   >
-                    View Project
+                    <span className="group-hover:mr-1 transition-all">View Project</span>
+                    <ArrowUpRight className="ml-2 w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                   </Button>
                 </CardContent>
               </Card>
@@ -471,8 +472,7 @@ export default function LandingPage() {
           
           <div className="text-center">
             <Button 
-              variant="outline" 
-              className="border-gray-700 text-gray-300 hover:bg-gray-800"
+              className="bg-secondary/10 text-secondary hover:bg-secondary/20 border border-secondary/30"
               onClick={() => navigate("/browse-issues")}
             >
               Browse All Projects <ArrowRight className="ml-2 w-4 h-4" />
@@ -482,52 +482,161 @@ export default function LandingPage() {
       </section>
 
       {/* Top Contributors */}
-      <section className="py-24 bg-[#0D1117]">
+      <section className="py-24 bg-[#2C023F]">
         <div className="container mx-auto px-4">
+          <div className="mb-16 text-center">
+            <span className="inline-block px-4 py-1 bg-primary/10 border border-primary/30 rounded-full text-primary text-sm mb-4">
+              LEADERBOARD
+            </span>
+            <h2 className="heading-font text-3xl text-white text-center mb-4 uppercase tracking-wider">Developer Rankings</h2>
+            <p className="text-white/70 max-w-2xl mx-auto">Top contributors and their developer scores</p>
+          </div>
+          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
             {/* Contributors */}
             <div>
-              <h2 className="text-2xl font-bold text-white mb-8">Top Contributors</h2>
+              <h3 className="heading-font text-xl text-white mb-8 flex items-center">
+                <Badge className="mr-2 bg-primary text-white">Top Earners</Badge>
+              </h3>
               <div className="grid grid-cols-1 gap-6">
                 {[
-                  { name: "web3wizard", avatar: "W", earned: "2,500 CREW" },
-                  { name: "codehunter", avatar: "C", earned: "1,750 CREW" },
-                  { name: "devmaster", avatar: "D", earned: "1,200 CREW" },
+                  { name: "web3wizard", avatar: "W", earned: "2,500 CREW", score: 815 },
+                  { name: "codehunter", avatar: "C", earned: "1,750 CREW", score: 762 },
+                  { name: "devmaster", avatar: "D", earned: "1,200 CREW", score: 723 },
                 ].map((contributor, index) => (
-                  <div key={index} className="flex items-center p-4 bg-[#161B22] rounded-lg border border-gray-800">
-                    <div className="w-12 h-12 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-lg mr-4">
+                  <div key={index} className="flex items-center p-4 bg-[#3C3050]/50 rounded-lg border border-border group hover:border-primary/50 transition-all">
+                    <div className="w-12 h-12 rounded-full bg-primary/20 border border-primary/30 text-primary flex items-center justify-center font-bold text-lg mr-4 group-hover:scale-110 transition-transform">
                       {contributor.avatar}
                     </div>
                     <div className="flex-1">
                       <h4 className="text-white font-medium">{contributor.name}</h4>
-                      <p className="text-gray-400 text-sm">GitHub</p>
+                      <p className="text-white/70 text-sm">GitHub</p>
                     </div>
-                    <div className="text-right">
-                      <div className="text-primary font-medium">{contributor.earned}</div>
-                      <p className="text-gray-400 text-sm">earned</p>
+                    <div className="flex items-center">
+                      <div className="text-right mr-4">
+                        <div className="text-primary font-medium">{contributor.earned}</div>
+                        <div className="text-white/70 text-sm">earned</div>
+                      </div>
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center border-2 border-primary bg-primary/10">
+                        <span className="text-sm font-bold text-white">{contributor.score}</span>
+                      </div>
                     </div>
                   </div>
                 ))}
+                
+                <div className="mt-6">
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        className="w-full border-primary/30 text-primary hover:bg-primary/10"
+                      >
+                        Check Your Score <Star className="ml-2 w-4 h-4" />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="bg-card border-border">
+                      <DialogHeader>
+                        <DialogTitle className="heading-font text-center text-xl mb-4">DEVELOPER SCORE</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        {!showScoreResult ? (
+                          <>
+                            <p className="text-center text-white mb-4">
+                              Enter your GitHub username to calculate your developer score
+                            </p>
+                            <div className="flex space-x-2">
+                              <Input
+                                value={githubUsername}
+                                onChange={(e) => setGithubUsername(e.target.value)}
+                                placeholder="GitHub Username"
+                                className="bg-muted text-white border-border"
+                              />
+                              <Button 
+                                onClick={calculateScore}
+                                className="bg-primary hover:bg-primary/90 text-white"
+                              >
+                                Calculate
+                              </Button>
+                            </div>
+                          </>
+                        ) : (
+                          <div className="text-center py-6">
+                            <div className="w-32 h-32 mx-auto rounded-full flex items-center justify-center border-4 border-primary bg-muted mb-4">
+                              <span className="text-3xl font-bold text-white">{userScore}</span>
+                            </div>
+                            <h3 className="text-xl font-bold text-white mb-2">
+                              {userScore && userScore > 700 ? 'Excellent' : 
+                               userScore && userScore > 600 ? 'Good' : 
+                               userScore && userScore > 500 ? 'Average' : 'Needs Improvement'}
+                            </h3>
+                            <p className="text-muted-foreground">
+                              Based on your GitHub contributions, code quality, and project history
+                            </p>
+                            <Button 
+                              onClick={() => setShowScoreResult(false)} 
+                              className="mt-4 bg-primary hover:bg-primary/90 text-white"
+                            >
+                              Check Another
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
               </div>
             </div>
             
             {/* Testimonials */}
             <div>
-              <h2 className="text-2xl font-bold text-white mb-8">Testimonials</h2>
-              <div className="bg-[#161B22] p-8 rounded-lg border border-gray-800">
-                <svg className="w-10 h-10 text-primary/30 mb-4" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
-                </svg>
-                <p className="text-gray-300 text-lg mb-6">
-                  "I fixed a small bug in a popular library and earned $150 worth of tokens. It was surprisingly straightforward and rewarding!"
-                </p>
-                <div className="flex items-center">
-                  <div className="w-10 h-10 rounded-full bg-secondary/20 text-secondary flex items-center justify-center font-bold text-sm mr-3">
-                    JS
+              <h3 className="heading-font text-xl text-white mb-8 flex items-center">
+                <Badge className="mr-2 bg-secondary text-white">Developer Stories</Badge>
+              </h3>
+              
+              <div className="space-y-6">
+                <div className="bg-[#3C3050]/50 p-6 rounded-lg border border-border hover:border-secondary/50 transition-all">
+                  <svg className="w-10 h-10 text-secondary/50 mb-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
+                  </svg>
+                  <p className="text-white/90 text-lg mb-6">
+                    "I fixed a small bug in a popular library and earned $150 worth of tokens. My developer score increased by 35 points!"
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="w-10 h-10 rounded-full bg-secondary/20 border border-secondary/30 text-secondary flex items-center justify-center font-bold text-sm mr-3">
+                        JS
+                      </div>
+                      <div>
+                        <h4 className="text-white font-medium">jsdev23</h4>
+                        <p className="text-white/70 text-sm">Full-stack Developer</p>
+                      </div>
+                    </div>
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center border-2 border-secondary bg-secondary/10">
+                      <span className="text-sm font-bold text-white">678</span>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="text-white font-medium">jsdev23</h4>
-                    <p className="text-gray-400 text-sm">Full-stack Developer</p>
+                </div>
+                
+                <div className="bg-[#3C3050]/50 p-6 rounded-lg border border-border hover:border-secondary/50 transition-all">
+                  <svg className="w-10 h-10 text-secondary/50 mb-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
+                  </svg>
+                  <p className="text-white/90 text-lg mb-6">
+                    "I've been contributing to open source for years, but now I can actually earn while doing what I love!"
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="w-10 h-10 rounded-full bg-secondary/20 border border-secondary/30 text-secondary flex items-center justify-center font-bold text-sm mr-3">
+                        RK
+                      </div>
+                      <div>
+                        <h4 className="text-white font-medium">rustcoder</h4>
+                        <p className="text-white/70 text-sm">Backend Developer</p>
+                      </div>
+                    </div>
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center border-2 border-secondary bg-secondary/10">
+                      <span className="text-sm font-bold text-white">742</span>
+                    </div>
                   </div>
                 </div>
               </div>
