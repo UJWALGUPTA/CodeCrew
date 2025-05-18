@@ -119,18 +119,26 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <section className="relative py-24 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#161B22] to-[#0D1117]"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-[#341D63] to-[#2C023F]"></div>
         <div className="absolute inset-0 opacity-20">
           <div className="absolute inset-0 bg-grid-pattern-overlay"></div>
         </div>
         
+        {/* Decorative elements */}
+        <div className="absolute top-20 left-10 w-32 h-32 rounded-full bg-primary/20 blur-3xl"></div>
+        <div className="absolute bottom-20 right-10 w-40 h-40 rounded-full bg-secondary/20 blur-3xl"></div>
+        <div className="absolute top-40 right-20 w-24 h-24 rounded-full bg-accent/20 blur-3xl"></div>
+        
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
-              Earn Crypto for Contributing to Open Source
+            <div className="inline-block mb-4 px-4 py-1 bg-primary/10 border border-primary/30 rounded-full">
+              <span className="text-sm text-primary">Decentralized Developer Platform</span>
+            </div>
+            <h1 className="heading-font text-3xl md:text-4xl lg:text-5xl text-white mb-6 leading-tight neon-primary tracking-wider uppercase">
+              EARN CRYPTO FOR<br />OPEN SOURCE CONTRIBUTIONS
             </h1>
-            <p className="text-xl text-gray-300 mb-10">
-              Fix bugs, add features, review code — get rewarded when your work is accepted
+            <p className="text-xl text-white/80 mb-10">
+              Fix bugs, add features, review code — get rewarded with CREW tokens on Pharos Testnet
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
@@ -140,22 +148,74 @@ export default function LandingPage() {
               >
                 Launch App
               </Button>
-              <Button 
-                variant="outline" 
-                className="border-gray-700 text-gray-200 hover:bg-gray-800 px-8 py-6 text-lg h-auto"
-              >
-                Join Community
-              </Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    className="border-secondary text-secondary hover:bg-secondary/10 px-8 py-6 text-lg h-auto"
+                  >
+                    Get Your Score <Star className="ml-2 w-5 h-5" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="bg-card border-border">
+                  <DialogHeader>
+                    <DialogTitle className="heading-font text-center text-xl mb-4">DEVELOPER SCORE</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    {!showScoreResult ? (
+                      <>
+                        <p className="text-center text-white mb-4">
+                          Enter your GitHub username to calculate your developer score
+                        </p>
+                        <div className="flex space-x-2">
+                          <Input
+                            value={githubUsername}
+                            onChange={(e) => setGithubUsername(e.target.value)}
+                            placeholder="GitHub Username"
+                            className="bg-muted text-white border-border"
+                          />
+                          <Button 
+                            onClick={calculateScore} 
+                            className="bg-primary hover:bg-primary/90 text-white"
+                          >
+                            Calculate
+                          </Button>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="text-center py-6">
+                        <div className="w-32 h-32 mx-auto rounded-full flex items-center justify-center border-4 border-primary bg-muted mb-4">
+                          <span className="text-3xl font-bold text-white">{userScore}</span>
+                        </div>
+                        <h3 className="text-xl font-bold text-white mb-2">
+                          {userScore && userScore > 700 ? 'Excellent' : 
+                           userScore && userScore > 600 ? 'Good' : 
+                           userScore && userScore > 500 ? 'Average' : 'Needs Improvement'}
+                        </h3>
+                        <p className="text-muted-foreground">
+                          Based on your GitHub contributions, code quality, and project history
+                        </p>
+                        <Button 
+                          onClick={() => setShowScoreResult(false)} 
+                          className="mt-4 bg-primary hover:bg-primary/90 text-white"
+                        >
+                          Check Another
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
             
             {/* Trust Bar */}
-            <div className="pt-10 border-t border-gray-800">
-              <p className="text-sm text-gray-400 mb-6">Trusted by developers from</p>
+            <div className="pt-10 border-t border-border/50">
+              <p className="text-sm text-white/60 mb-6">Trusted by developers from</p>
               <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-4 opacity-70">
-                <img src="https://cdn.worldvectorlogo.com/logos/github-icon-1.svg" className="h-8 w-auto grayscale" alt="GitHub" />
-                <img src="https://cdn.worldvectorlogo.com/logos/aws-2.svg" className="h-8 w-auto grayscale" alt="AWS" />
-                <img src="https://cdn.worldvectorlogo.com/logos/microsoft-5.svg" className="h-8 w-auto grayscale" alt="Microsoft" />
-                <img src="https://cdn.worldvectorlogo.com/logos/zoho-2.svg" className="h-8 w-auto grayscale" alt="Zoho" />
+                <img src="https://cdn.worldvectorlogo.com/logos/github-icon-1.svg" className="h-8 w-auto brightness-200" alt="GitHub" />
+                <img src="https://cdn.worldvectorlogo.com/logos/aws-2.svg" className="h-8 w-auto brightness-200" alt="AWS" />
+                <img src="https://cdn.worldvectorlogo.com/logos/microsoft-5.svg" className="h-8 w-auto brightness-200" alt="Microsoft" />
+                <img src="https://cdn.worldvectorlogo.com/logos/zoho-2.svg" className="h-8 w-auto brightness-200" alt="Zoho" />
               </div>
             </div>
           </div>
@@ -163,104 +223,110 @@ export default function LandingPage() {
       </section>
 
       {/* How It Works */}
-      <section id="how-it-works" className="py-24 bg-[#161B22]">
+      <section id="how-it-works" className="py-24 bg-[#312442]">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-white text-center mb-16">How CodeCrew Works</h2>
+          <div className="mb-16 text-center">
+            <span className="inline-block px-4 py-1 bg-primary/10 border border-primary/30 rounded-full text-primary text-sm mb-4">
+              EASY TO USE
+            </span>
+            <h2 className="heading-font text-3xl text-white text-center mb-4 uppercase tracking-wider">How NexusVoid Works</h2>
+            <p className="text-white/70 max-w-2xl mx-auto">Connecting developers with meaningful work and rewards on the Pharos Testnet</p>
+          </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
             {/* For Contributors */}
-            <div>
-              <h3 className="text-xl font-semibold text-white mb-8 flex items-center">
+            <div className="bg-[#3C3050]/50 p-8 rounded-lg border border-[#52476C]">
+              <h3 className="heading-font text-xl text-white mb-8 flex items-center">
                 <Badge className="mr-2 bg-primary text-white">For Contributors</Badge>
               </h3>
               
               <div className="space-y-8">
                 <div className="flex items-start">
-                  <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-4">
+                  <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-4 border border-primary/30">
                     <Github className="w-6 h-6 text-primary" />
                   </div>
                   <div>
                     <h4 className="text-lg font-medium text-white mb-1">Connect GitHub + Wallet</h4>
-                    <p className="text-gray-400">Link your GitHub account and crypto wallet to get started</p>
+                    <p className="text-white/70">Link your GitHub account and crypto wallet to get started</p>
                   </div>
                 </div>
                 
                 <div className="flex items-start">
-                  <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-4">
+                  <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-4 border border-primary/30">
                     <Bug className="w-6 h-6 text-primary" />
                   </div>
                   <div>
                     <h4 className="text-lg font-medium text-white mb-1">Pick an Issue with Bounty</h4>
-                    <p className="text-gray-400">Browse open issues with attached token rewards</p>
+                    <p className="text-white/70">Browse open issues with attached token rewards</p>
                   </div>
                 </div>
                 
                 <div className="flex items-start">
-                  <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-4">
-                    <Code className="w-6 h-6 text-primary" />
+                  <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-4 border border-primary/30">
+                    <Star className="w-6 h-6 text-primary" />
                   </div>
                   <div>
-                    <h4 className="text-lg font-medium text-white mb-1">Submit PR</h4>
-                    <p className="text-gray-400">Work on the issue and create a pull request on GitHub</p>
+                    <h4 className="text-lg font-medium text-white mb-1">Boost Your Score</h4>
+                    <p className="text-white/70">Increase your developer score with each contribution</p>
                   </div>
                 </div>
                 
                 <div className="flex items-start">
-                  <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-4">
+                  <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-4 border border-primary/30">
                     <Wallet className="w-6 h-6 text-primary" />
                   </div>
                   <div>
                     <h4 className="text-lg font-medium text-white mb-1">Get Paid in Crypto</h4>
-                    <p className="text-gray-400">Receive tokens automatically when your PR is merged</p>
+                    <p className="text-white/70">Receive CREW tokens automatically when your PR is merged</p>
                   </div>
                 </div>
               </div>
             </div>
             
             {/* For Pool Managers */}
-            <div>
-              <h3 className="text-xl font-semibold text-white mb-8 flex items-center">
+            <div className="bg-[#3C3050]/50 p-8 rounded-lg border border-[#52476C]">
+              <h3 className="heading-font text-xl text-white mb-8 flex items-center">
                 <Badge className="mr-2 bg-secondary text-white">For Pool Managers</Badge>
               </h3>
               
               <div className="space-y-8">
                 <div className="flex items-start">
-                  <div className="flex-shrink-0 w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center mr-4">
+                  <div className="flex-shrink-0 w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center mr-4 border border-secondary/30">
                     <Github className="w-6 h-6 text-secondary" />
                   </div>
                   <div>
                     <h4 className="text-lg font-medium text-white mb-1">Install GitHub App</h4>
-                    <p className="text-gray-400">Add the CodeCrew app to your repositories</p>
+                    <p className="text-white/70">Add the NexusVoid app to your repositories</p>
                   </div>
                 </div>
                 
                 <div className="flex items-start">
-                  <div className="flex-shrink-0 w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center mr-4">
+                  <div className="flex-shrink-0 w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center mr-4 border border-secondary/30">
                     <Wallet className="w-6 h-6 text-secondary" />
                   </div>
                   <div>
                     <h4 className="text-lg font-medium text-white mb-1">Fund Issues</h4>
-                    <p className="text-gray-400">Add bounties to issues that need attention</p>
+                    <p className="text-white/70">Add bounties to issues that need attention</p>
                   </div>
                 </div>
                 
                 <div className="flex items-start">
-                  <div className="flex-shrink-0 w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center mr-4">
+                  <div className="flex-shrink-0 w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center mr-4 border border-secondary/30">
                     <CheckCircle className="w-6 h-6 text-secondary" />
                   </div>
                   <div>
                     <h4 className="text-lg font-medium text-white mb-1">Approve PRs</h4>
-                    <p className="text-gray-400">Review and merge high-quality contributions</p>
+                    <p className="text-white/70">Review and merge high-quality contributions</p>
                   </div>
                 </div>
                 
                 <div className="flex items-start">
-                  <div className="flex-shrink-0 w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center mr-4">
+                  <div className="flex-shrink-0 w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center mr-4 border border-secondary/30">
                     <Zap className="w-6 h-6 text-secondary" />
                   </div>
                   <div>
                     <h4 className="text-lg font-medium text-white mb-1">Release Rewards</h4>
-                    <p className="text-gray-400">Tokens are automatically sent to contributors</p>
+                    <p className="text-white/70">Tokens are automatically sent to contributors</p>
                   </div>
                 </div>
               </div>
@@ -270,100 +336,124 @@ export default function LandingPage() {
       </section>
 
       {/* Ways to Contribute */}
-      <section className="py-24 bg-[#0D1117]">
+      <section className="py-24 bg-[#2C023F]">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-white text-center mb-16">Ways to Contribute</h2>
+          <div className="mb-16 text-center">
+            <span className="inline-block px-4 py-1 bg-secondary/10 border border-secondary/30 rounded-full text-secondary text-sm mb-4">
+              OPPORTUNITIES
+            </span>
+            <h2 className="heading-font text-3xl text-white text-center mb-4 uppercase tracking-wider">Ways to Contribute</h2>
+            <p className="text-white/70 max-w-2xl mx-auto">Multiple ways to earn rewards and boost your developer score</p>
+          </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
-              { icon: <Bug className="w-6 h-6" />, title: "Fix Bugs", description: "Squash bugs and improve stability" },
-              { icon: <Zap className="w-6 h-6" />, title: "Add Features", description: "Implement new functionality" },
-              { icon: <FileText className="w-6 h-6" />, title: "Write Docs", description: "Improve documentation and examples" },
-              { icon: <Server className="w-6 h-6" />, title: "Test Software", description: "Create tests and ensure quality" },
-              { icon: <Code className="w-6 h-6" />, title: "Review Code", description: "Help maintain code quality" },
-              { icon: <PenTool className="w-6 h-6" />, title: "Help Others", description: "Answer questions and mentor" }
+              { icon: <Bug className="w-6 h-6" />, title: "Fix Bugs", description: "Squash bugs and improve stability", color: "primary" },
+              { icon: <Zap className="w-6 h-6" />, title: "Add Features", description: "Implement new functionality", color: "secondary" },
+              { icon: <FileText className="w-6 h-6" />, title: "Write Docs", description: "Improve documentation and examples", color: "accent" },
+              { icon: <Server className="w-6 h-6" />, title: "Test Software", description: "Create tests and ensure quality", color: "primary" },
+              { icon: <Code className="w-6 h-6" />, title: "Review Code", description: "Help maintain code quality", color: "secondary" },
+              { icon: <PenTool className="w-6 h-6" />, title: "Help Others", description: "Answer questions and mentor", color: "accent" }
             ].map((item, index) => (
-              <Card key={index} className="bg-[#161B22] border-gray-800 hover:border-primary/50 transition-all hover:shadow-md hover:shadow-primary/10">
+              <Card key={index} className={`bg-[#3C3050]/50 border-border hover:border-${item.color}/50 transition-all hover:shadow-lg hover:shadow-${item.color}/10 overflow-hidden group`}>
+                <div className={`h-1 w-full bg-${item.color}`}></div>
                 <CardContent className="p-6">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-primary">
+                  <div className={`w-12 h-12 rounded-full bg-${item.color}/10 border border-${item.color}/30 flex items-center justify-center mb-4 text-${item.color} group-hover:scale-110 transition-transform`}>
                     {item.icon}
                   </div>
                   <h3 className="text-lg font-semibold text-white mb-2">{item.title}</h3>
-                  <p className="text-gray-400 mb-4">{item.description}</p>
-                  <a href="#" className="text-primary inline-flex items-center text-sm hover:underline">
-                    Explore Bounties <ChevronRight className="ml-1 w-4 h-4" />
+                  <p className="text-white/70 mb-4">{item.description}</p>
+                  <a href="#" className={`text-${item.color} inline-flex items-center text-sm hover:underline`}>
+                    Explore Bounties <ChevronRight className="ml-1 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </a>
                 </CardContent>
               </Card>
             ))}
           </div>
+          
+          <div className="mt-12 text-center">
+            <Button className="bg-primary/10 text-primary hover:bg-primary/20 border border-primary/30">
+              View All Opportunities <ArrowRight className="ml-2 w-4 h-4" />
+            </Button>
+          </div>
         </div>
       </section>
 
       {/* Featured Projects */}
-      <section id="browse" className="py-24 bg-[#161B22]">
+      <section id="browse" className="py-24 bg-[#341D63]">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-white text-center mb-8">Featured Projects</h2>
-          <p className="text-gray-400 text-center max-w-2xl mx-auto mb-16">
-            Explore open-source projects with active bounties ready for contributions
-          </p>
+          <div className="mb-16 text-center">
+            <span className="inline-block px-4 py-1 bg-accent/10 border border-accent/30 rounded-full text-accent text-sm mb-4">
+              BOUNTIES AVAILABLE
+            </span>
+            <h2 className="heading-font text-3xl text-white text-center mb-4 uppercase tracking-wider">Featured Projects</h2>
+            <p className="text-white/70 max-w-2xl mx-auto">
+              Explore open-source projects with active bounties ready for contributions
+            </p>
+          </div>
 
           <div className="flex justify-center mb-10 overflow-x-auto pb-4">
             <div className="flex space-x-2">
               <Button variant="secondary" className="bg-primary text-white hover:bg-primary/90">All</Button>
-              <Button variant="outline" className="border-gray-700 text-gray-300 hover:border-gray-600">Web3</Button>
-              <Button variant="outline" className="border-gray-700 text-gray-300 hover:border-gray-600">AI</Button>
-              <Button variant="outline" className="border-gray-700 text-gray-300 hover:border-gray-600">DevTools</Button>
-              <Button variant="outline" className="border-gray-700 text-gray-300 hover:border-gray-600">Infra</Button>
+              <Button variant="outline" className="border-border text-white hover:border-primary/50 hover:bg-primary/10">Web3</Button>
+              <Button variant="outline" className="border-border text-white hover:border-primary/50 hover:bg-primary/10">AI</Button>
+              <Button variant="outline" className="border-border text-white hover:border-primary/50 hover:bg-primary/10">DevTools</Button>
+              <Button variant="outline" className="border-border text-white hover:border-primary/50 hover:bg-primary/10">Infra</Button>
             </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-10">
             {[
               {
                 name: "ethereum/solidity",
                 description: "Solidity, the Smart Contract Programming Language",
                 tags: ["blockchain", "languages"],
                 issues: 42,
-                pool: "3.2 ETH"
+                pool: "3.2 ETH",
+                color: "primary"
               },
               {
                 name: "defi-protocol/lending",
                 description: "Decentralized lending protocol for Pharos Testnet",
                 tags: ["defi", "finance"],
                 issues: 28,
-                pool: "500 USDC"
+                pool: "500 USDC",
+                color: "secondary"
               },
               {
                 name: "ai-toolkit/models",
                 description: "Open source AI models and utilities",
                 tags: ["ai", "machine-learning"],
                 issues: 56,
-                pool: "2.5 ETH"
+                pool: "2.5 ETH",
+                color: "accent"
               },
             ].map((project, index) => (
-              <Card key={index} className="bg-[#0D1117] border-gray-800 hover:border-primary/50 transition-all">
+              <Card key={index} className="bg-[#3C3050]/50 border-border hover:border-primary/50 transition-all group overflow-hidden">
+                <div className={`h-1 w-full bg-${project.color}`}></div>
                 <CardContent className="p-6">
                   <div className="flex justify-between items-start mb-4">
                     <div>
                       <h3 className="text-lg font-semibold text-white mb-1">{project.name}</h3>
-                      <p className="text-gray-400 text-sm mb-3">{project.description}</p>
+                      <p className="text-white/70 text-sm mb-3">{project.description}</p>
                       <div className="flex flex-wrap gap-2">
                         {project.tags.map((tag, i) => (
-                          <Badge key={i} variant="outline" className="text-xs">{tag}</Badge>
+                          <Badge key={i} variant="outline" className="text-xs border-primary/30 bg-primary/10 text-primary">{tag}</Badge>
                         ))}
                       </div>
                     </div>
-                    <Github className="w-5 h-5 text-gray-500" />
+                    <div className={`w-8 h-8 rounded-full bg-${project.color}/10 border border-${project.color}/30 flex items-center justify-center`}>
+                      <Github className="w-4 h-4 text-primary" />
+                    </div>
                   </div>
                   
-                  <div className="flex justify-between pt-4 border-t border-gray-800">
+                  <div className="flex justify-between pt-4 border-t border-border">
                     <div className="text-sm">
-                      <span className="text-gray-500">Open Issues:</span>
+                      <span className="text-white/50">Open Issues:</span>
                       <span className="ml-2 text-white">{project.issues}</span>
                     </div>
                     <div className="text-sm">
-                      <span className="text-gray-500">Total Pool:</span>
+                      <span className="text-white/50">Total Pool:</span>
                       <span className="ml-2 text-primary font-medium">{project.pool}</span>
                     </div>
                   </div>
