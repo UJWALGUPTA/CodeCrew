@@ -19,7 +19,7 @@ const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
 export function getReplicationUrl(req: Request, path: string) {
   if (process.env.REPLIT_DEPLOYMENT_ID) {
     // We're on a deployed Replit instance
-    return `https://${process.env.REPLIT_DOMAINS?.split(",")[0] || req.headers.host}${path}`;
+    return `https://codecrew.in${path}`;
   } else {
     // We're in development
     return `http://${req.headers.host}${path}`;
@@ -37,14 +37,16 @@ export const startGithubOAuth = (req: Request, res: Response) => {
 
   // Store the state in the session for verification later
   req.session.oauthState = state;
-  
+
   // Save the session explicitly to ensure the state is stored before redirect
   req.session.save((err) => {
     if (err) {
       console.error("Failed to save session state:", err);
-      return res.status(500).json({ message: "Authentication failed - session error" });
+      return res
+        .status(500)
+        .json({ message: "Authentication failed - session error" });
     }
-    
+
     // Redirect to GitHub's authorization page
     const callbackUrl = getCallbackUrl(req);
     const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${encodeURIComponent(callbackUrl)}&scope=user%20repo&state=${state}`;
@@ -59,18 +61,23 @@ export const handleGithubCallback = async (req: Request, res: Response) => {
 
   console.log("GitHub callback received with state:", state);
   console.log("Session state is:", req.session.oauthState);
-  
+
   // For deployed environments, bypass state check completely for better user experience
   if (process.env.REPLIT_DEPLOYMENT_ID) {
-    console.log("Deployed environment detected - bypassing state verification for better UX");
+    console.log(
+      "Deployed environment detected - bypassing state verification for better UX",
+    );
     // Continue flow regardless of state in deployment environment
-  } 
-  // Development environment: Verify state to prevent CSRF attacks 
+  }
+  // Development environment: Verify state to prevent CSRF attacks
   else if (!state || state !== req.session.oauthState) {
-    console.error(`State mismatch: Received ${state} but expected ${req.session.oauthState}`);
-    return res.status(400).json({ 
+    console.error(
+      `State mismatch: Received ${state} but expected ${req.session.oauthState}`,
+    );
+    return res.status(400).json({
       message: "Invalid state parameter",
-      details: "The state parameter from GitHub doesn't match what we expected. This could be due to session issues or using different browser tabs."
+      details:
+        "The state parameter from GitHub doesn't match what we expected. This could be due to session issues or using different browser tabs.",
     });
   }
 
@@ -99,7 +106,7 @@ export const handleGithubCallback = async (req: Request, res: Response) => {
       console.error("GitHub OAuth error:", tokenData.error);
       return res.status(400).json({
         message: tokenData.error_description || "Authentication failed",
-        details: "Error during GitHub token exchange"
+        details: "Error during GitHub token exchange",
       });
     }
 
@@ -136,14 +143,16 @@ export const handleGithubCallback = async (req: Request, res: Response) => {
     // Set user in session
     if (user) {
       req.session.userId = user.id;
-      
+
       // Explicitly save the session to avoid race conditions
       req.session.save((err) => {
         if (err) {
           console.error("Failed to save user session:", err);
-          return res.status(500).json({ message: "Authentication failed - session error" });
+          return res
+            .status(500)
+            .json({ message: "Authentication failed - session error" });
         }
-        
+
         console.log("User authenticated and session saved:", user.username);
         // Redirect to dashboard
         res.redirect("/dashboard");
@@ -153,9 +162,12 @@ export const handleGithubCallback = async (req: Request, res: Response) => {
     }
   } catch (error) {
     console.error("GitHub OAuth error:", error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: "Authentication failed",
-      details: error instanceof Error ? error.message : "Unknown error during authentication"
+      details:
+        error instanceof Error
+          ? error.message
+          : "Unknown error during authentication",
     });
   }
 };
