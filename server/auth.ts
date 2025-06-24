@@ -19,7 +19,7 @@ const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
 export function getReplicationUrl(req: Request, path: string) {
   if (process.env.REPLIT_DEPLOYMENT_ID) {
     // We're on a deployed Replit instance
-    return `https://codecrew.in${path}`;
+    return `https://${process.env.REPLIT_DOMAINS?.split(",")[0] || req.headers.host}${path}`;
   } else {
     // We're in development
     return `http://${req.headers.host}${path}`;
@@ -154,8 +154,8 @@ export const handleGithubCallback = async (req: Request, res: Response) => {
         }
 
         console.log("User authenticated and session saved:", user.username);
-        // Redirect to the main app (home page will check auth and redirect appropriately)
-        res.redirect("/");
+        // Redirect to dashboard
+        res.redirect("/dashboard");
       });
     } else {
       throw new Error("Failed to create or update user");
