@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useAuth } from "@/hooks/use-auth";
 import { 
   ArrowRight, Code, Bug, PenTool, FileText, 
   Zap, Server, Github, CheckCircle, ArrowUpRight,
@@ -16,6 +17,14 @@ export default function LandingPage() {
   const [githubUsername, setGithubUsername] = useState('');
   const [userScore, setUserScore] = useState<number | null>(null);
   const [showScoreResult, setShowScoreResult] = useState(false);
+  const { user, isLoading } = useAuth();
+
+  // Redirect authenticated users to dashboard
+  useEffect(() => {
+    if (!isLoading && user) {
+      navigate("/dashboard");
+    }
+  }, [user, isLoading, navigate]);
   
   // Function to calculate user score based on GitHub username
   const calculateScore = () => {
@@ -27,6 +36,20 @@ export default function LandingPage() {
     setUserScore(randomScore);
     setShowScoreResult(true);
   };
+
+  // Show loading while checking authentication
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  // Don't render landing page if user is authenticated (will redirect)
+  if (user) {
+    return null;
+  }
   
   return (
     <div className="flex flex-col min-h-screen bg-background">

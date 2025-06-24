@@ -154,8 +154,8 @@ export const handleGithubCallback = async (req: Request, res: Response) => {
         }
 
         console.log("User authenticated and session saved:", user.username);
-        // Redirect to dashboard
-        res.redirect("/dashboard");
+        // Redirect to the main app (home page will check auth and redirect appropriately)
+        res.redirect("/");
       });
     } else {
       throw new Error("Failed to create or update user");
